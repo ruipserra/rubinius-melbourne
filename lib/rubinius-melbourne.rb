@@ -1,7 +1,7 @@
 require "rubinius-melbourne/version"
 
 module Rubinius
-  module Melbourne
+  class Melbourne
     # Your code goes here...
   end
 end
