@@ -14,4 +14,9 @@ Gem::Specification.new do |gem|
   gem.name          = "rubinius-melbourne"
   gem.require_paths = ["lib"]
   gem.version       = Rubinius::Melbourne::VERSION
+
+  gem.add_runtime_dependency      "redcard",  "~> 1.0"
+
+  gem.add_development_dependency  "mspec", "~> 1.5"
+  gem.add_development_dependency  "rake",  "~> 10.0"
 end
