@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/rubinius-melbourne/version', __FILE__)
+require 'rubinius/melbourne/version'
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Brian Shirai"]
@@ -10,6 +10,7 @@ Gem::Specification.new do |gem|
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.extensions    = ["ext/rubinius/melbourne/extconf.rb"]
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "rubinius-melbourne"
   gem.require_paths = ["lib"]
