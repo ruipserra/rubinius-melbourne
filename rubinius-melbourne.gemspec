@@ -6,7 +6,8 @@ Gem::Specification.new do |gem|
   gem.email         = ["brixen@gmail.com"]
   gem.description   = %q{Ruby parser extracted from MRI.}
   gem.summary       = %q{Rubinius Ruby Parser.}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/rubinius/rubinius-melbourne"
+  gem.license       = "BSD"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
