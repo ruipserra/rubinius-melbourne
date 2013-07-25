@@ -1,4 +1,5 @@
 require 'mkmf'
+require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
 
 def add_lib(name)
   i, lib = dir_config(name)
@@ -10,12 +11,11 @@ add_lib("bstring")
 add_lib("ptr_array")
 add_lib("cchash")
 
-#have_library("bstring")
-#have_library("mquark")
-#have_library("ptr_array")
-#have_library("cchash")
-
 $CFLAGS += " -ggdb3"
+
+File.open "namespace.h", "wb" do |f|
+  f.puts "#define MELBOURNE   melbourne_#{Rubinius::Melbourne::VERSION.gsub(/\./, "_")}"
+end
 
 # Courtesy of EventMachine. Thank you EventMachine and tmm1 !
 case RUBY_PLATFORM
