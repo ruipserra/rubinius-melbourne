@@ -10,43 +10,43 @@
 
 **********************************************************************/
 
-#ifndef MEL_NODE18_HPP
-#define MEL_NODE18_HPP
+#ifndef MEL_NODE_HPP
+#define MEL_NODE_HPP
 
+#include "namespace.h"
 #include "bstrlib.h"
 #include "melbourne.hpp"
 #include "quark.hpp"
 
-namespace melbourne {
-  namespace grammar18 {
+namespace MELBOURNE {
 
 #define QUID    quark
 
-    typedef struct RNode {
-      unsigned long flags;
-      char *nd_file;
-      union {
-        RNode *node;
-        QUID id;
-        VALUE value;
-        QUID *tbl;
-        bstring string;
-      } u1;
-      union {
-        struct RNode *node;
-        QUID id;
-        long argc;
-        VALUE value;
-      } u2;
-      union {
-        struct RNode *node;
-        QUID id;
-        long state;
-        long cnt;
-        VALUE value;
-        bstring string;
-      } u3;
-    } NODE;
+  typedef struct RNode {
+    unsigned long flags;
+    char *nd_file;
+    union {
+      RNode *node;
+      QUID id;
+      VALUE value;
+      QUID *tbl;
+      bstring string;
+    } u1;
+    union {
+      struct RNode *node;
+      QUID id;
+      long argc;
+      VALUE value;
+    } u2;
+    union {
+      struct RNode *node;
+      QUID id;
+      long state;
+      long cnt;
+      VALUE value;
+      bstring string;
+    } u3;
+  } NODE;
 
 #define RNODE(obj)  ((NODE*)(obj))
 
@@ -256,7 +256,6 @@ namespace melbourne {
 
 #define NOEX_UNDEF              NOEX_NOSUPER
 
-  }; // namespace grammar18
-}; // namespace melbourne
+};
 
 #endif

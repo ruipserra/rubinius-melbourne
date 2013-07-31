@@ -14,7 +14,10 @@ add_lib("cchash")
 $CFLAGS += " -ggdb3"
 
 File.open "namespace.h", "wb" do |f|
-  f.puts "#define MELBOURNE   melbourne_#{Rubinius::Melbourne::VERSION.gsub(/\./, "_")}"
+  melbourne = "melbourne_#{Rubinius::Melbourne::VERSION.gsub(/\./, "_")}"
+  f.puts "#define MELBOURNE                 #{melbourne}"
+  f.puts "#define MELBOURNE_FILE_TO_AST     #{melbourne}_file_to_ast"
+  f.puts "#define MELBOURNE_STRING_TO_AST   #{melbourne}_string_to_ast"
 end
 
 # Courtesy of EventMachine. Thank you EventMachine and tmm1 !

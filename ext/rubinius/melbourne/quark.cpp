@@ -1,12 +1,13 @@
+#include "namespace.h"
 #include "quark.hpp"
-#include "parser_state18.hpp"
+#include "parser_state.hpp"
 
 #include <string.h>
 #include <stdlib.h>
 
-using namespace melbourne::grammar18;
+using namespace MELBOURNE;
 
-quark melbourne::grammar18::quark_from_string(rb_parser_state* parser_state, const char* str) {
+quark MELBOURNE::quark_from_string(rb_parser_state* parser_state, const char* str) {
   if (str == NULL) {
     return QUARK_NOT_FOUND;
   }
@@ -25,13 +26,13 @@ quark melbourne::grammar18::quark_from_string(rb_parser_state* parser_state, con
   return index;
 }
 
-const char* melbourne::grammar18::quark_to_string(rb_parser_state* parser_state, quark q) {
+const char* MELBOURNE::quark_to_string(rb_parser_state* parser_state, quark q) {
   if (q >= quarks->size())
     return NULL;
   return quarks->at(q);
 }
 
-void melbourne::grammar18::quark_cleanup(rb_parser_state* parser_state) {
+void MELBOURNE::quark_cleanup(rb_parser_state* parser_state) {
   delete quark_indexes;
 
   for (quark_vector::iterator it = quarks->begin(); it != quarks->end(); ++it) {

@@ -1,12 +1,12 @@
 #include <sstream>
 
+#include "namespace.h"
 #include "melbourne.hpp"
-#include "parser_state18.hpp"
-#include "visitor18.hpp"
+#include "parser_state.hpp"
+#include "visitor.hpp"
 #include "symbols.hpp"
 
-namespace melbourne {
-  namespace grammar18 {
+namespace MELBOURNE {
 
   static VALUE string_newfrombstr(bstring str)
   {
@@ -959,5 +959,4 @@ namespace melbourne {
 
     return tree;
   }
-  }; // namespace grammar18
 };

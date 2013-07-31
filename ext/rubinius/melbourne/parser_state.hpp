@@ -1,116 +1,116 @@
-#ifndef MEL_PARSER_STATE18_HPP
-#define MEL_PARSER_STATE18_HPP
+#ifndef MEL_PARSER_STATE_HPP
+#define MEL_PARSER_STATE_HPP
 
-#include "node18.hpp"
-#include "node_types18.hpp"
+#include "namespace.h"
+#include "node.hpp"
+#include "node_types.hpp"
 #include "local_state.hpp"
 
 #include <vector>
 #include <list>
 
-namespace melbourne {
-  namespace grammar18 {
+namespace MELBOURNE {
 
-    enum lex_state_e {
-      EXPR_BEG,       /* ignore newline, +/- is a sign. */
-      EXPR_END,       /* newline significant, +/- is a operator. */
-      EXPR_ARG,       /* newline significant, +/- is a operator. */
-      EXPR_CMDARG,    /* newline significant, +/- is a operator. */
-      EXPR_ENDARG,    /* newline significant, +/- is a operator. */
-      EXPR_MID,       /* newline significant, +/- is a operator. */
-      EXPR_FNAME,     /* ignore newline, no reserved words. */
-      EXPR_DOT,       /* right after `.' or `::', no reserved words. */
-      EXPR_CLASS,     /* immediate after `class', no here document. */
-    };
+  enum lex_state_e {
+    EXPR_BEG,       /* ignore newline, +/- is a sign. */
+    EXPR_END,       /* newline significant, +/- is a operator. */
+    EXPR_ARG,       /* newline significant, +/- is a operator. */
+    EXPR_CMDARG,    /* newline significant, +/- is a operator. */
+    EXPR_ENDARG,    /* newline significant, +/- is a operator. */
+    EXPR_MID,       /* newline significant, +/- is a operator. */
+    EXPR_FNAME,     /* ignore newline, no reserved words. */
+    EXPR_DOT,       /* right after `.' or `::', no reserved words. */
+    EXPR_CLASS,     /* immediate after `class', no here document. */
+  };
 
 typedef VALUE stack_type;
 
-    struct StartPosition {
-      int line;
-      const char* kind;
+  struct StartPosition {
+    int line;
+    const char* kind;
 
-      StartPosition(int l, const char* k)
-        : line(l)
-        , kind(k)
-      {}
-    };
+    StartPosition(int l, const char* k)
+      : line(l)
+      , kind(k)
+    {}
+  };
 
-    typedef struct rb_parser_state {
-      int end_seen;
-      int debug_lines;
-      int heredoc_end;
-      int command_start;
-      NODE *lex_strterm;
-      int paren_nest;
-      int lpar_beg;
-      int class_nest;
-      int in_single;
-      int in_def;
-      int compile_for_eval;
-      ID cur_mid;
-      char *token_buffer;
-      int tokidx;
-      int toksiz;
-      int emit_warnings;
-      /* Mirror'ing the 1.8 parser, There are 2 input methods,
-         from IO and directly from a string. */
+  typedef struct rb_parser_state {
+    int end_seen;
+    int debug_lines;
+    int heredoc_end;
+    int command_start;
+    NODE *lex_strterm;
+    int paren_nest;
+    int lpar_beg;
+    int class_nest;
+    int in_single;
+    int in_def;
+    int compile_for_eval;
+    ID cur_mid;
+    char *token_buffer;
+    int tokidx;
+    int toksiz;
+    int emit_warnings;
+    /* Mirror'ing the 1.8 parser, There are 2 input methods,
+       from IO and directly from a string. */
 
-      /* this function reads a line from lex_io and stores it in
-       * line_buffer.
-       */
-      bool (*lex_gets)(rb_parser_state*);
-      bstring line_buffer;
+    /* this function reads a line from lex_io and stores it in
+     * line_buffer.
+     */
+    bool (*lex_gets)(rb_parser_state*);
+    bstring line_buffer;
 
-      /* If this is set, we use the io method. */
-      FILE *lex_io;
-      /* Otherwise, we use this. */
-      bstring lex_string;
-      bstring lex_lastline;
-      bstring lex_nextline;
+    /* If this is set, we use the io method. */
+    FILE *lex_io;
+    /* Otherwise, we use this. */
+    bstring lex_string;
+    bstring lex_lastline;
+    bstring lex_nextline;
 
-      char *lex_pbeg;
-      char *lex_p;
-      char *lex_pend;
-      int lex_str_used;
+    char *lex_pbeg;
+    char *lex_p;
+    char *lex_pend;
+    int lex_str_used;
 
-      enum lex_state_e lex_state;
-      int in_defined;
-      stack_type cond_stack;
-      stack_type cmdarg_stack;
+    enum lex_state_e lex_state;
+    int in_defined;
+    stack_type cond_stack;
+    stack_type cmdarg_stack;
 
-      void *lval; /* the parser's yylval */
-      bool eofp;
+    void *lval; /* the parser's yylval */
+    bool eofp;
 
-      std::vector<bstring>* magic_comments;
-      int column;
-      NODE *top_node;
+    std::vector<bstring>* magic_comments;
+    int column;
+    NODE *top_node;
 
-      LocalState* variables;
+    LocalState* variables;
 
-      int ternary_colon;
+    int ternary_colon;
 
-      void **memory_pools;
-      int pool_size, current_pool;
-      char *memory_cur;
-      char *memory_last_addr;
-      int memory_size;
+    void **memory_pools;
+    int pool_size, current_pool;
+    char *memory_cur;
+    char *memory_last_addr;
+    int memory_size;
 
-      bool verbose;
+    bool verbose;
 
-      bool parse_error;
-      VALUE processor;
+    bool parse_error;
+    VALUE processor;
 
-      char *sourcefile;
-      int sourceline;
+    char *sourcefile;
+    int sourceline;
 
-      // Keeps track of lines that 'end' starters are on, to enable
-      // better error reporting.
-      std::list<StartPosition>* start_lines;
+    // Keeps track of lines that 'end' starters are on, to enable
+    // better error reporting.
+    std::list<StartPosition>* start_lines;
 
-      // Tracks quarks
-      quark_map* quark_indexes;
-      quark_vector* quarks;
-    } rb_parser_state;
+    // Tracks quarks
+    quark_map* quark_indexes;
+    quark_vector* quarks;
+  } rb_parser_state;
 
 
 #define PARSER_STATE        ((rb_parser_state*)parser_state)
@@ -174,8 +174,7 @@ typedef VALUE stack_type;
 
 #define node_newnode(t, a, b, c)  parser_node_newnode((rb_parser_state*)parser_state, t, a, b, c)
 
-    quark id_to_quark(rb_parser_state* parser_state, QUID id);
-  };  // namespace grammar18
-};  // namespace melbourne
+  quark id_to_quark(rb_parser_state* parser_state, QUID id);
+};
 
 #endif
