@@ -1,3 +1,4 @@
+#include "namespace.h"
 #include "melbourne.hpp"
 #include "symbols.hpp"
 
@@ -5,7 +6,7 @@
 extern "C" {
 #endif
 
-namespace melbourne {
+namespace MELBOURNE {
   ID rb_sAlias;
   ID rb_sAnd;
   ID rb_sArgs;
@@ -115,9 +116,9 @@ namespace melbourne {
 }  /* extern "C" { */
 #endif
 
-namespace melbourne {
+namespace MELBOURNE {
 
-  void init_symbols20() {
+  void init_symbols() {
     rb_sAlias       = rb_intern("process_alias");
     rb_sAnd         = rb_intern("process_and");
     rb_sArgs        = rb_intern("process_args");

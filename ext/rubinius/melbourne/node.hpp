@@ -10,37 +10,37 @@
 
 **********************************************************************/
 
-#ifndef MEL_NODE19_HPP
-#define MEL_NODE19_HPP
+#ifndef MEL_NODE_HPP
+#define MEL_NODE_HPP
 
+#include "namespace.h"
 #include "melbourne.hpp"
 
-namespace melbourne {
-  namespace grammar19 {
+namespace MELBOURNE {
 
-    typedef struct RNode {
-      unsigned long flags;
-      char *nd_file;
-      union {
-        RNode *node;
-        ID id;
-        VALUE value;
-        ID *tbl;
-      } u1;
-      union {
-        struct RNode *node;
-        ID id;
-        long argc;
-        VALUE value;
-      } u2;
-      union {
-        struct RNode *node;
-        ID id;
-        long state;
-        long cnt;
-        VALUE value;
-      } u3;
-    } NODE;
+  typedef struct RNode {
+    unsigned long flags;
+    char *nd_file;
+    union {
+      RNode *node;
+      ID id;
+      VALUE value;
+      ID *tbl;
+    } u1;
+    union {
+      struct RNode *node;
+      ID id;
+      long argc;
+      VALUE value;
+    } u2;
+    union {
+      struct RNode *node;
+      ID id;
+      long state;
+      long cnt;
+      VALUE value;
+    } u3;
+  } NODE;
 
 #define RNODE(obj)  ((NODE*)(obj))
 
@@ -265,7 +265,6 @@ namespace melbourne {
 #define NOEX_VCALL              0x40,
 #define NOEX_RESPONDS           0x80
 
-  }; // namespace grammar19
-}; // namespace melbourne
+};
 
 #endif

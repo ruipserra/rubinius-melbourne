@@ -1,12 +1,12 @@
 #include <sstream>
 
+#include "namespace.h"
 #include "melbourne.hpp"
-#include "parser_state19.hpp"
-#include "visitor19.hpp"
+#include "parser_state.hpp"
+#include "visitor.hpp"
 #include "symbols.hpp"
 
-namespace melbourne {
-  namespace grammar19 {
+namespace MELBOURNE {
 
   void create_error(rb_parser_state *parser_state, char *msg) {
     VALUE err_msg;
@@ -956,5 +956,4 @@ namespace melbourne {
 
     return tree;
   }
-  }; // namespace grammar19
 };

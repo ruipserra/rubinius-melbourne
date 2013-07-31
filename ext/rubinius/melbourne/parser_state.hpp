@@ -1,134 +1,132 @@
-#ifndef MEL_PARSER_STATE19_HPP
-#define MEL_PARSER_STATE19_HPP
+#ifndef MEL_PARSER_STATE_HPP
+#define MEL_PARSER_STATE_HPP
 
-#include "node19.hpp"
-#include "node_types19.hpp"
-#include "var_table19.hpp"
+#include "namespace.h"
+#include "node.hpp"
+#include "node_types.hpp"
+#include "var_table.hpp"
 #include "encoding_compat.hpp"
-
-#include "bstrlib.h"
 
 #include <vector>
 #include <list>
 
-namespace melbourne {
-  namespace grammar19 {
+namespace MELBOURNE {
 
-    enum lex_state_e {
-      EXPR_BEG,       /* ignore newline, +/- is a sign. */
-      EXPR_END,       /* newline significant, +/- is an operator. */
-      EXPR_ENDARG,    /* ditto, and unbound braces. */
-      EXPR_ENDFN,     /* ditto, and unbound braces. */
-      EXPR_ARG,       /* newline significant, +/- is an operator. */
-      EXPR_CMDARG,    /* newline significant, +/- is an operator. */
-      EXPR_MID,       /* newline significant, +/- is an operator. */
-      EXPR_FNAME,     /* ignore newline, no reserved words. */
-      EXPR_DOT,       /* right after `.' or `::', no reserved words. */
-      EXPR_CLASS,     /* immediate after `class', no here document. */
-      EXPR_VALUE,     /* like EXPR_BEG but label is disallowed. */
-      EXPR_MAX_STATE
-    };
+  enum lex_state_e {
+    EXPR_BEG,       /* ignore newline, +/- is a sign. */
+    EXPR_END,       /* newline significant, +/- is an operator. */
+    EXPR_ENDARG,    /* ditto, and unbound braces. */
+    EXPR_ENDFN,     /* ditto, and unbound braces. */
+    EXPR_ARG,       /* newline significant, +/- is an operator. */
+    EXPR_CMDARG,    /* newline significant, +/- is an operator. */
+    EXPR_MID,       /* newline significant, +/- is an operator. */
+    EXPR_FNAME,     /* ignore newline, no reserved words. */
+    EXPR_DOT,       /* right after `.' or `::', no reserved words. */
+    EXPR_CLASS,     /* immediate after `class', no here document. */
+    EXPR_VALUE,     /* like EXPR_BEG but label is disallowed. */
+    EXPR_MAX_STATE
+  };
 
 typedef VALUE stack_type;
 
-    struct StartPosition {
-      int line;
-      const char* kind;
+  struct StartPosition {
+    int line;
+    const char* kind;
 
-      StartPosition(int l, const char* k)
-        : line(l)
-        , kind(k)
-      {}
-    };
+    StartPosition(int l, const char* k)
+      : line(l)
+      , kind(k)
+    {}
+  };
 
-    typedef struct rb_parser_state {
-      int ruby__end__seen;
-      int debug_lines;
-      int heredoc_end;
-      int command_start;
-      NODE *lex_strterm;
-      int paren_nest;
-      int lpar_beg;
-      int class_nest;
-      int in_single;
-      int in_def;
-      int compile_for_eval;
-      ID cur_mid;
-      char *token_buffer;
-      int tokidx;
-      int toksiz;
-      int emit_warnings;
-      /* Mirror'ing the 1.8 parser, There are 2 input methods,
-         from IO and directly from a string. */
+  typedef struct rb_parser_state {
+    int ruby__end__seen;
+    int debug_lines;
+    int heredoc_end;
+    int command_start;
+    NODE *lex_strterm;
+    int paren_nest;
+    int lpar_beg;
+    int class_nest;
+    int in_single;
+    int in_def;
+    int compile_for_eval;
+    ID cur_mid;
+    char *token_buffer;
+    int tokidx;
+    int toksiz;
+    int emit_warnings;
+    /* Mirror'ing the 1.8 parser, There are 2 input methods,
+       from IO and directly from a string. */
 
-      /* this function reads a line from lex_io and stores it in
-       * line_buffer.
-       */
-      VALUE (*lex_gets)(rb_parser_state*, VALUE);
+    /* this function reads a line from lex_io and stores it in
+     * line_buffer.
+     */
+    VALUE (*lex_gets)(rb_parser_state*, VALUE);
 
-      /* If this is set, we use the io method. */
-      int lex_io;
-      char* lex_io_buf;
-      ssize_t lex_io_index;
-      ssize_t lex_io_total;
-      long lex_io_count;
+    /* If this is set, we use the io method. */
+    int lex_io;
+    char* lex_io_buf;
+    ssize_t lex_io_index;
+    ssize_t lex_io_total;
+    long lex_io_count;
 
-      /* Otherwise, we use this. */
-      long lex_gets_ptr;
-      VALUE lex_input;
-      VALUE lex_lastline;
-      VALUE lex_nextline;
+    /* Otherwise, we use this. */
+    long lex_gets_ptr;
+    VALUE lex_input;
+    VALUE lex_lastline;
+    VALUE lex_nextline;
 
-      char *lex_pbeg;
-      char *lex_p;
-      char *lex_pend;
-      int lex_str_used;
+    char *lex_pbeg;
+    char *lex_p;
+    char *lex_pend;
+    int lex_str_used;
 
-      enum lex_state_e lex_state;
-      int in_defined;
-      stack_type cond_stack;
-      stack_type cmdarg_stack;
+    enum lex_state_e lex_state;
+    int in_defined;
+    stack_type cond_stack;
+    stack_type cmdarg_stack;
 
-      void *lval; /* the parser's yylval */
-      bool eofp;
+    void *lval; /* the parser's yylval */
+    bool eofp;
 
-      int column;
-      NODE *top_node;
+    int column;
+    NODE *top_node;
 
-      struct local_vars* locals_table;
+    struct local_vars* locals_table;
 
-      int ternary_colon;
+    int ternary_colon;
 
-      void **memory_pools;
-      int pool_size, current_pool;
-      char *memory_cur;
-      char *memory_last_addr;
-      int memory_size;
+    void **memory_pools;
+    int pool_size, current_pool;
+    char *memory_cur;
+    char *memory_last_addr;
+    int memory_size;
 
-      bool verbose;
+    bool verbose;
 
-      bool parse_error;
+    bool parse_error;
 
-      // Reference to the object to call methods on to convert the
-      // C parse tree into a Ruby AST.
-      VALUE processor;
+    // Reference to the object to call methods on to convert the
+    // C parse tree into a Ruby AST.
+    VALUE processor;
 
-      // Keep track of any object literals created in the parser.
-      VALUE references;
+    // Keep track of any object literals created in the parser.
+    VALUE references;
 
-      // Keeps track of lines that 'end' starters are on, to enable
-      // better error reporting.
-      std::list<StartPosition>* start_lines;
+    // Keeps track of lines that 'end' starters are on, to enable
+    // better error reporting.
+    std::list<StartPosition>* start_lines;
 
-      int line_count;
-      bool has_shebang;
+    int line_count;
+    bool has_shebang;
 
-      char *sourcefile;
-      int sourceline;
+    char *sourcefile;
+    int sourceline;
 
-      rb_encoding *enc;
-      rb_encoding *utf8;
-    } rb_parser_state;
+    rb_encoding *enc;
+    rb_encoding *utf8;
+  } rb_parser_state;
 
 
 #define PARSER_STATE        ((rb_parser_state*)parser_state)
@@ -193,12 +191,12 @@ typedef VALUE stack_type;
 #define sourceline          PARSER_VAR(sourceline)
 
 #define node_newnode(t, a, b, c)  \
-    parser_node_newnode((rb_parser_state*)parser_state, t, a, b, c)
+  parser_node_newnode((rb_parser_state*)parser_state, t, a, b, c)
 #define node_add_reference(obj)   \
-    parser_add_reference((rb_parser_state*)parser_state, obj)
+  parser_add_reference((rb_parser_state*)parser_state, obj)
 
-    NODE *parser_node_newnode(rb_parser_state*, enum node_type, VALUE, VALUE, VALUE);
-    VALUE parser_add_reference(rb_parser_state* parser_state, VALUE obj);
+  NODE *parser_node_newnode(rb_parser_state*, enum node_type, VALUE, VALUE, VALUE);
+  VALUE parser_add_reference(rb_parser_state* parser_state, VALUE obj);
 
 #undef ID_SCOPE_SHIFT
 #undef ID_SCOPE_MASK
@@ -211,19 +209,19 @@ typedef VALUE stack_type;
 #undef ID_JUNK
 #undef ID_INTERNAL
 
-    ID parser_intern(const char*);
-    ID parser_intern2(const char*, long);
-    ID parser_intern3(const char*, long, rb_encoding*);
-    ID parser_intern_str(VALUE);
-    char* parser_id2name(ID);
+  ID parser_intern(const char*);
+  ID parser_intern2(const char*, long);
+  ID parser_intern3(const char*, long, rb_encoding*);
+  ID parser_intern_str(VALUE);
+  char* parser_id2name(ID);
 
 #undef ID2SYM
 
 /* ID_SCOPE_SHIFT must be at least 4 because at 3 the values will overlap
- * the values of the tokens, causing the parser to mistake the symbol for
- * '*' with the token tAREF. Hilarity ensues when Fixnum * Fixnum ends up
- * parsed as Fixnum[Fixnum].
- */
+* the values of the tokens, causing the parser to mistake the symbol for
+* '*' with the token tAREF. Hilarity ensues when Fixnum * Fixnum ends up
+* parsed as Fixnum[Fixnum].
+*/
 #define ID_SCOPE_SHIFT  7
 #define ID_SCOPE_MASK   0x0f
 #define ID_LOCAL        0x00
@@ -244,7 +242,6 @@ typedef VALUE stack_type;
 
 #define INTERNAL_ID_P(a)  ((a & ID_INTERNAL) == ID_INTERNAL)
 
-  };  // namespace grammar19
-};  // namespace melbourne
+};
 
 #endif

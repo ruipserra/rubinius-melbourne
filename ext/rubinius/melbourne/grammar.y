@@ -15,15 +15,14 @@
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
+#include "namespace.h"
 #include "melbourne.hpp"
-#include "grammar19.hpp"
-#include "parser_state19.hpp"
-#include "visitor19.hpp"
+#include "grammar.hpp"
+#include "parser_state.hpp"
+#include "visitor.hpp"
 #include "symbols.hpp"
 
-namespace melbourne {
-
-namespace grammar19 {
+namespace MELBOURNE {
 
 #undef TRUE
 #undef FALSE
@@ -7119,5 +7118,4 @@ parser_internal_id(rb_parser_state *parser_state)
   return ID_INTERNAL | (id << ID_SCOPE_SHIFT);
 }
 
-}; // namespace grammar19
-}; // namespace melbourne
+};
