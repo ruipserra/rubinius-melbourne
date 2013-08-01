@@ -15,7 +15,7 @@ VALUE MELBOURNE_STRING_TO_AST(VALUE self, VALUE source, VALUE name, VALUE line) 
   return result;
 }
 
-VALUE MELBOURNE_FILE_TO_AST(vALUE self, VALUE fname, VALUE start) {
+VALUE MELBOURNE_FILE_TO_AST(VALUE self, VALUE fname, VALUE start) {
   StringValue(fname);
 
   int fd = open(RSTRING_PTR(fname), O_RDONLY);

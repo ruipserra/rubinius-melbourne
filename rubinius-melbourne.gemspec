@@ -15,9 +15,10 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "rubinius-melbourne"
   gem.require_paths = ["lib"]
-  gem.version       = Rubinius::Melbourne::VERSION
+  gem.version       = Rubinius::ToolSet.current::TS::Melbourne::VERSION
 
   gem.add_runtime_dependency      "redcard",  "~> 1.0"
+  gem.add_runtime_dependency      "rubinius-toolset"
 
   gem.add_development_dependency  "mspec", "~> 1.5"
   gem.add_development_dependency  "rake",  "~> 10.0"
