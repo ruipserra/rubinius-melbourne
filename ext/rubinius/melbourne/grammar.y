@@ -15,15 +15,14 @@
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
+#include "namespace.h"
 #include "melbourne.hpp"
-#include "grammar18.hpp"
-#include "parser_state18.hpp"
-#include "visitor18.hpp"
+#include "grammar.hpp"
+#include "parser_state.hpp"
+#include "visitor.hpp"
 #include "symbols.hpp"
 
-namespace melbourne {
-
-namespace grammar18 {
+namespace MELBOURNE {
 
 #ifndef isnumber
 #define isnumber isdigit
@@ -6061,5 +6060,4 @@ quark id_to_quark(rb_parser_state* parser_state, QUID id) {
   return qrk;
 }
 
-}; // namespace grammar18
-}; // namespace melbourne
+};

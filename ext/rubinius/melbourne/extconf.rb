@@ -1,20 +1,12 @@
 require 'mkmf'
+require 'rubinius/toolset'
 require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
-
-def add_lib(name)
-  i, lib = dir_config(name)
-  $libs << " #{lib}/lib#{name}.a "
-end
-
-add_lib("mquark")
-add_lib("bstring")
-add_lib("ptr_array")
-add_lib("cchash")
 
 $CFLAGS += " -ggdb3"
 
 File.open "namespace.h", "wb" do |f|
-  melbourne = "melbourne_#{Rubinius::Melbourne::VERSION.gsub(/\./, "_")}"
+  version = Rubinius::ToolSet.current::TS::Melbourne::VERSION
+  melbourne = "melbourne_#{version.gsub(/\./, "_")}"
   f.puts "#define MELBOURNE                 #{melbourne}"
   f.puts "#define MELBOURNE_FILE_TO_AST     #{melbourne}_file_to_ast"
   f.puts "#define MELBOURNE_STRING_TO_AST   #{melbourne}_string_to_ast"

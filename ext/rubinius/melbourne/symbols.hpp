@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-namespace melbourne {
+namespace MELBOURNE {
   extern ID rb_sAlias;
   extern ID rb_sAnd;
   extern ID rb_sArgs;
@@ -109,7 +109,7 @@ namespace melbourne {
   extern ID rb_sZArray;
   extern ID rb_sZSuper;
 
-  void init_symbols20();
+  void init_symbols();
 };
 
 #ifdef __cplusplus
