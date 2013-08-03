@@ -37,7 +37,7 @@ VALUE MELBOURNE_FILE_TO_AST(VALUE self, VALUE fname, VALUE start) {
 }
 
 void Init_melbourne(void) {
-  VALUE rb_cMelbourne, rb_mToolSet, rb_mTScurrent;
+  VALUE rb_cMelbourne, rb_mToolSet, rb_mTScurrent, rb_mTS;
 
   MELBOURNE::init_symbols();
 
@@ -47,7 +47,8 @@ void Init_melbourne(void) {
 
   rb_mToolSet = rb_const_get(rb_mRubinius, rb_intern("ToolSet"));
   rb_mTScurrent = rb_funcall(rb_mToolSet, rb_intern("current"), 0);
-  rb_cMelbourne = rb_define_class_under(rb_mTScurrent, "Melbourne", rb_cObject);
+  rb_mTS = rb_define_module_under(rb_mTScurrent, "TS");
+  rb_cMelbourne = rb_define_class_under(rb_mTS, "Melbourne", rb_cObject);
   rb_define_method(rb_cMelbourne, "string_to_ast",
       RUBY_METHOD_FUNC(MELBOURNE_STRING_TO_AST), 3);
   rb_define_method(rb_cMelbourne, "file_to_ast",
