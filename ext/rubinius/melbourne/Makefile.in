@@ -8,6 +8,7 @@ ECHO1 = $(V:1=@:)
 ECHO = $(ECHO1:0=@echo)
 
 RM = rm -f
+COPY = cp
 
 CXX = %s
 CXXFLAGS = %s
@@ -19,6 +20,8 @@ DLLIB = %s
 DLDFLAGS = %s
 LIBPATH = %s
 LIBS = %s
+
+INSTALL_PATH = %s
 
 
 .PHONY: all install
@@ -32,6 +35,7 @@ distclean:
 	-$(Q)$(RM) $(OBJS) $(DLLIB) Makefile namespace.h
 
 install:
+	-$(Q)$(COPY) $(DLLIB) $(INSTALL_PATH)
 
 
 .SUFFIXES: .y .cpp .o

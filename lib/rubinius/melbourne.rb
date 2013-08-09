@@ -1,4 +1,4 @@
-require "melbourne"
+require "rubinius/melbourne/melbourne"
 require "rubinius/melbourne/version"
 
 class String

@@ -1,14 +1,4 @@
 require 'rbconfig'
-require 'rubinius/toolset'
-require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
-
-File.open "namespace.h", "wb" do |f|
-  version = Rubinius::ToolSet.current::TS::Melbourne::VERSION
-  melbourne = "melbourne_#{version.gsub(/\./, "_")}"
-  f.puts "#define MELBOURNE                 #{melbourne}"
-  f.puts "#define MELBOURNE_FILE_TO_AST     #{melbourne}_file_to_ast"
-  f.puts "#define MELBOURNE_STRING_TO_AST   #{melbourne}_string_to_ast"
-end
 
 if not File.exists? "Makefile" or
     File.mtime("Makefile.in") > File.mtime("Makefile")
@@ -24,10 +14,12 @@ if not File.exists? "Makefile" or
   dldflags += " #{RbConfig::CONFIG["DLDFLAGS"]}"
   libpath = "-L. -L#{RbConfig::CONFIG["libdir"]}"
   libs = RbConfig::CONFIG["LIBS"]
+  install_path = Dir.pwd.sub %r[/ext/rubinius/melbourne$], "/lib/rubinius/melbourne"
 
   template = IO.read "Makefile.in"
 
   File.open "Makefile", "wb" do |f|
-    f.print template % [cxx, cxxflags, incflags, objs, ldsharedxx, dllib, dldflags, libpath, libs]
+    f.print template % [cxx, cxxflags, incflags, objs,
+                        ldsharedxx, dllib, dldflags, libpath, libs, install_path]
   end
 end
