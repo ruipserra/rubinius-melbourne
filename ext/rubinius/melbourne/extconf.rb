@@ -52,7 +52,7 @@ clean:
 	-$(Q)$(RM) $(OBJS) $(DLLIB)
 
 distclean:
-	-$(Q)$(RM) $(OBJS) $(DLLIB) Makefile namespace.h
+	-$(Q)$(RM) $(OBJS) $(DLLIB) Makefile
 
 install:
 	-$(Q)$(COPY) $(DLLIB) $(INSTALL_PATH)
