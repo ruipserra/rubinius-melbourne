@@ -1,3 +1,6 @@
+*.o
+*.bundle
+*.so
 *.gem
 *.rbc
 .bundle
@@ -16,3 +19,5 @@ test/tmp
 test/version_tmp
 tmp
 .rbx
+Makefile
+namespace.h
