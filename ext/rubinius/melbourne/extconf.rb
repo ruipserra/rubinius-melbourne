@@ -1,8 +1,6 @@
-require 'mkmf'
+require 'rbconfig'
 require 'rubinius/toolset'
 require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
-
-$CFLAGS += " -ggdb3"
 
 File.open "namespace.h", "wb" do |f|
   version = Rubinius::ToolSet.current::TS::Melbourne::VERSION
@@ -12,61 +10,24 @@ File.open "namespace.h", "wb" do |f|
   f.puts "#define MELBOURNE_STRING_TO_AST   #{melbourne}_string_to_ast"
 end
 
-# Courtesy of EventMachine. Thank you EventMachine and tmm1 !
-case RUBY_PLATFORM
-when /mswin32/, /mingw32/, /bccwin32/
-  check_heads(%w[windows.h winsock.h], true)
-  check_libs(%w[kernel32 rpcrt4 gdi32], true)
+if not File.exists? "Makefile" or
+    File.mtime("Makefile.in") > File.mtime("Makefile")
+  cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"]
+  cxxflags = ENV["CXXFLAGS"] || ENV["CPPFLAGS"] || RbConfig::CONFIG["CXXFLAGS"]
+  incflags = "-I. -I#{RbConfig::CONFIG["rubyarchhdrdir"]} "
+  incflags += "-I#{RbConfig::CONFIG["rubyhdrdir"]} "
+  objs = Dir["*.{c,cpp}"].map { |x| x.sub /\.(c|cpp)$/, ".o" }.join(" ")
 
-  if GNU_CHAIN
-    CONFIG['LDSHARED'] = "$(CXX) -shared -lstdc++"
-  else
-    $defs.push "-EHs"
-    $defs.push "-GR"
+  ldsharedxx = ENV["LDSHAREDXX"] || ENV["LDSHARED"] || RbConfig::CONFIG["LDSHAREDXX"]
+  dllib = "melbourne." + RbConfig::CONFIG["DLEXT"]
+  dldflags = ENV["LDFLAGS"] || RbConfig::CONFIG["LDFLAGS"] || ""
+  dldflags += " #{RbConfig::CONFIG["DLDFLAGS"]}"
+  libpath = "-L. -L#{RbConfig::CONFIG["libdir"]}"
+  libs = RbConfig::CONFIG["LIBS"]
+
+  template = IO.read "Makefile.in"
+
+  File.open "Makefile", "wb" do |f|
+    f.print template % [cxx, cxxflags, incflags, objs, ldsharedxx, dllib, dldflags, libpath, libs]
   end
-
-when /solaris/
-  add_define 'OS_SOLARIS8'
-
-  if CONFIG['CC'] == 'cc' and `cc -flags 2>&1` =~ /Sun/ # detect SUNWspro compiler
-    # SUN CHAIN
-    add_define 'CC_SUNWspro'
-    $preload = ["\nCXX = CC"] # hack a CXX= line into the makefile
-    $CFLAGS = CONFIG['CFLAGS'] = "-KPIC"
-    CONFIG['CCDLFLAGS'] = "-KPIC"
-    CONFIG['LDSHARED'] = "$(CXX) -G -KPIC -lCstd"
-  else
-    # GNU CHAIN
-    # on Unix we need a g++ link, not gcc.
-    CONFIG['LDSHARED'] = "$(CXX) -shared"
-  end
-
-when /openbsd/
-  # OpenBSD branch contributed by Guillaume Sellier.
-
-  # on Unix we need a g++ link, not gcc. On OpenBSD, linking against libstdc++ have to be explicitly done for shared libs
-  CONFIG['LDSHARED'] = "$(CXX) -shared -lstdc++ -fPIC"
-  CONFIG['LDSHAREDXX'] = "$(CXX) -shared -lstdc++ -fPIC"
-
-when /darwin/
-  # on Unix we need a g++ link, not gcc.
-  # Ff line contributed by Daniel Harple.
-  CONFIG['LDSHARED'] = "$(CXX) " + CONFIG['LDSHARED'].split[1..-1].join(' ')
-
-when /aix/
-  CONFIG['LDSHARED'] = "$(CXX) -shared -Wl,-G -Wl,-brtl"
-
-else
-  # on Unix we need a g++ link, not gcc.
-  CONFIG['LDSHARED'] = "$(CXX) -shared"
-end
-
-create_makefile('melbourne')
-
-File.open("Makefile","a+") do |f|
-  f.puts <<END
-
-grammar.cpp: grammar.y
-	bison -o grammar.cpp grammar.y
-END
 end
