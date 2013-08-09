@@ -20,4 +20,3 @@ test/version_tmp
 tmp
 .rbx
 Makefile
-namespace.h
