@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+require 'rubinius/toolset'
 require './lib/rubinius/melbourne/version'
 
 Gem::Specification.new do |spec|
