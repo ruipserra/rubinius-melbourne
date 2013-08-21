@@ -10,9 +10,9 @@ Gem::Specification.new do |spec|
   spec.license       = "BSD"
 
   spec.files         = `git ls-files`.split($\)
-  spec.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  spec.executables   = spec.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   spec.extensions    = ["ext/rubinius/melbourne/extconf.rb"]
-  spec.test_files    = gem.files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.name          = "rubinius-melbourne"
   spec.require_paths = ["lib"]
   spec.version       = Rubinius::ToolSet.current::TS::Melbourne::VERSION
