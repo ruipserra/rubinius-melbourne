@@ -18,8 +18,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.version       = Rubinius::ToolSet.current::TS::Melbourne::VERSION
 
-  spec.required_ruby_version = "~> 2.0"
-
   spec.add_runtime_dependency      "rubinius-toolset"
 
   spec.add_development_dependency  "mspec", "~> 1.5"
