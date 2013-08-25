@@ -4,8 +4,15 @@ unless File.exists? "Makefile" and
     File.mtime("Makefile") > File.mtime(__FILE__)
   cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"]
   cxxflags = ENV["CXXFLAGS"] || ENV["CPPFLAGS"] || RbConfig::CONFIG["CXXFLAGS"]
-  incflags = "-I. -I#{RbConfig::CONFIG["rubyarchhdrdir"]} "
-  incflags += "-I#{RbConfig::CONFIG["rubyhdrdir"]} "
+  incdirs = [
+    RbConfig::CONFIG["topdir"],
+    RbConfig::CONFIG["hdrdir"],
+    RbConfig::CONFIG["rubyarchhdrdir"],
+    RbConfig::CONFIG["rubyhdrdir"],
+    RbConfig::CONFIG["srcdir"]
+  ].compact.uniq
+
+  incflags = "-I. #{incdirs.map { |x| "-I#{x}" }.join(" ")}"
   objs = Dir["*.{c,cpp}"].map { |x| x.sub(/\.(c|cpp)$/, ".o") }.join(" ")
 
   ldsharedxx = ENV["LDSHAREDXX"] || ENV["LDSHARED"] || RbConfig::CONFIG["LDSHAREDXX"]
