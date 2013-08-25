@@ -21,10 +21,16 @@ unless File.exists? "Makefile" and
     RbConfig::CONFIG["arch_hdrdir"],
     RbConfig::CONFIG["topdir"],
     RbConfig::CONFIG["hdrdir"],
-    RbConfig::CONFIG["rubyarchhdrdir"],
     RbConfig::CONFIG["rubyhdrdir"],
     RbConfig::CONFIG["srcdir"]
   ].compact.uniq
+
+  archincdirs = []
+  incdirs.each do |x|
+    dir = "#{x}/#{RbConfig::CONFIG["arch"]}"
+    archincdirs << dir if File.exists? dir
+  end
+  incdirs.concat archincdirs
 
   incflags = "-I. #{incdirs.map { |x| "-I#{x}" }.join(" ")}"
   objs = Dir["*.{c,cpp}"].map { |x| x.sub(/\.(c|cpp)$/, ".o") }.join(" ")
