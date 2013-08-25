@@ -18,6 +18,7 @@ unless File.exists? "Makefile" and
   cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"]
   cxxflags = ENV["CXXFLAGS"] || ENV["CPPFLAGS"] || RbConfig::CONFIG["CXXFLAGS"]
   incdirs = [
+    RbConfig::CONFIG["arch_hdrdir"],
     RbConfig::CONFIG["topdir"],
     RbConfig::CONFIG["hdrdir"],
     RbConfig::CONFIG["rubyarchhdrdir"],
