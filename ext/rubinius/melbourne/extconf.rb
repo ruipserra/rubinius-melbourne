@@ -1,5 +1,6 @@
 require 'rbconfig'
 
+require 'rubygems'
 require 'rubinius/toolset'
 require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
 
