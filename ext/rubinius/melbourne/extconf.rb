@@ -17,6 +17,8 @@ unless File.exists? "Makefile" and
     File.mtime("Makefile") > File.mtime(__FILE__)
   cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"]
   cxxflags = ENV["CXXFLAGS"] || ENV["CPPFLAGS"] || RbConfig::CONFIG["CXXFLAGS"]
+  cxxflags << " -fPIC"
+
   incdirs = [
     RbConfig::CONFIG["arch_hdrdir"],
     RbConfig::CONFIG["topdir"],
