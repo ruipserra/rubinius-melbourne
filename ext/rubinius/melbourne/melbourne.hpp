@@ -5,6 +5,7 @@
 #include <strings.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>
