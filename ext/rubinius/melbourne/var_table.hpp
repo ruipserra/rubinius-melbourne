@@ -24,6 +24,7 @@ namespace MELBOURNE {
   int vtable_size(const struct vtable* tbl);
   struct vtable* vtable_alloc(struct vtable *prev);
   void vtable_free(struct vtable* tbl);
+  void vtable_free_all(struct vtable* tbl);
   void vtable_add(struct vtable* tbl, ID id);
   bool vtable_included(const struct vtable* tbl, ID id);
 
