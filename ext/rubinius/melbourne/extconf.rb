@@ -1,7 +1,14 @@
 require 'rbconfig'
 
-require 'rubygems'
-require 'rubinius/toolset'
+# Fake out Rubinius::ToolSet for bootstrapping
+module Rubinius
+  module ToolSet
+    def self.current
+      @current ||= Module.new
+    end
+  end
+end
+
 require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
 
 path = File.expand_path "../namespace.h", __FILE__
