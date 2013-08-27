@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
-require 'rubinius/melbourne/version'
+require 'rubinius/toolset'
+require './lib/rubinius/melbourne/version'
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Brian Shirai"]
@@ -17,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Rubinius::ToolSet.current::TS::Melbourne::VERSION
 
-  gem.add_runtime_dependency      "redcard",  "~> 1.0"
   gem.add_runtime_dependency      "rubinius-toolset"
 
   gem.add_development_dependency  "mspec", "~> 1.5"
