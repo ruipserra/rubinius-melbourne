@@ -22,8 +22,9 @@ end
 
 unless File.exists? "Makefile" and
     File.mtime("Makefile") > File.mtime(__FILE__)
-  cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"]
-  cxxflags = ENV["CXXFLAGS"] || ENV["CPPFLAGS"] || RbConfig::CONFIG["CXXFLAGS"] || ""
+  cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"] || RbConfig::CONFIG["CC"]
+  cxxflags = ENV["CXXFLAGS"] || ENV["CPPFLAGS"] ||
+             RbConfig::CONFIG["CXXFLAGS"] || RbConfig::CONFIG["CPPFLAGS"] || ""
   cxxflags << " -fPIC"
 
   incdirs = [
@@ -44,7 +45,8 @@ unless File.exists? "Makefile" and
   incflags = "-I. #{incdirs.map { |x| "-I#{x}" }.join(" ")}"
   objs = Dir["*.{c,cpp}"].map { |x| x.sub(/\.(c|cpp)$/, ".o") }.join(" ")
 
-  ldsharedxx = ENV["LDSHAREDXX"] || ENV["LDSHARED"] || RbConfig::CONFIG["LDSHAREDXX"]
+  ldsharedxx = ENV["LDSHAREDXX"] || ENV["LDSHARED"] ||
+               RbConfig::CONFIG["LDSHAREDXX"] || RbConfig::CONFIG["LDSHARED"]
   dllib = "melbourne." + RbConfig::CONFIG["DLEXT"]
   dldflags = ENV["LDFLAGS"] || RbConfig::CONFIG["LDFLAGS"] || ""
   dldflags += " #{RbConfig::CONFIG["DLDFLAGS"]}"
