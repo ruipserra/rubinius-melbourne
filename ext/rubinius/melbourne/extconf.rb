@@ -45,8 +45,7 @@ unless File.exists? "Makefile" and
   incflags = "-I. #{incdirs.map { |x| "-I#{x}" }.join(" ")}"
   objs = Dir["*.{c,cpp}"].map { |x| x.sub(/\.(c|cpp)$/, ".o") }.join(" ")
 
-  ldsharedxx = ENV["LDSHAREDXX"] || ENV["LDSHARED"] ||
-               RbConfig::CONFIG["LDSHAREDXX"] || RbConfig::CONFIG["LDSHARED"]
+  ldsharedxx = ENV["LDSHAREDXX"] || RbConfig::CONFIG["LDSHAREDXX"] || "g++ -shared"
   dllib = "melbourne." + RbConfig::CONFIG["DLEXT"]
   dldflags = ENV["LDFLAGS"] || RbConfig::CONFIG["LDFLAGS"] || ""
   dldflags += " #{RbConfig::CONFIG["DLDFLAGS"]}"
