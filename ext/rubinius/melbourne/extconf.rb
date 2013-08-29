@@ -45,7 +45,59 @@ unless File.exists? "Makefile" and
   incflags = "-I. #{incdirs.map { |x| "-I#{x}" }.join(" ")}"
   objs = Dir["*.{c,cpp}"].map { |x| x.sub(/\.(c|cpp)$/, ".o") }.join(" ")
 
-  ldsharedxx = ENV["LDSHAREDXX"] || RbConfig::CONFIG["LDSHAREDXX"] || "g++ -shared"
+  ldsharedxx = ENV["LDSHAREDXX"] || RbConfig::CONFIG["LDSHAREDXX"]
+  unless ldsharedxx
+    # Courtesy of EventMachine. Thank you EventMachine and tmm1 !
+    case RUBY_PLATFORM
+    when /mswin32/, /mingw32/, /bccwin32/
+      # TODO
+      # check_heads(%w[windows.h winsock.h], true)
+      # check_libs(%w[kernel32 rpcrt4 gdi32], true)
+
+      # if GNU_CHAIN
+      #   CONFIG['LDSHARED'] = "$(CXX) -shared -lstdc++"
+      # else
+      #   $defs.push "-EHs"
+      #   $defs.push "-GR"
+      # end
+
+    when /solaris/
+      cxxflags << " -DOS_SOLARIS8"
+
+      # detect SUNWspro compiler
+      if RbConfig::CONFIG['CC'] == 'cc' and `cc -flags 2>&1` =~ /Sun/
+        # SUN CHAIN
+        cxxflags << " -DCC_SUNWspro"
+        cxxflags.gsub! /-fPIC/, ""
+        cxxflags << " -KPIC"
+        ldsharedxx = "#{cxx} -G -KPIC -lCstd"
+      else
+        # GNU CHAIN
+        # on Unix we need a g++ link, not gcc.
+        ldsharedxx = "#{cxx} -shared"
+      end
+
+    when /openbsd/
+      # OpenBSD branch contributed by Guillaume Sellier.
+
+      # on Unix we need a g++ link, not gcc. On OpenBSD, linking against
+      # libstdc++ have to be explicitly done for shared libs
+      ldsharedxx = "#{cxx} -shared -lstdc++ -fPIC"
+
+    when /darwin/
+      # on Unix we need a g++ link, not gcc.
+      # Ff line contributed by Daniel Harple.
+      ldsharedxx = "#{cxx} #{RbConfig::CONFIG['LDSHARED'].split[1..-1].join(' ')}"
+
+    when /aix/
+      ldsharedxx = "#{cxx} -shared -Wl,-G -Wl,-brtl"
+
+    else
+      # on Unix we need a g++ link, not gcc.
+      ldsharedxx = "#{cxx} -shared"
+    end
+  end
+
   dllib = "melbourne." + RbConfig::CONFIG["DLEXT"]
   dldflags = ENV["LDFLAGS"] || RbConfig::CONFIG["LDFLAGS"] || ""
   dldflags += " #{RbConfig::CONFIG["DLDFLAGS"]}"
