@@ -23,9 +23,8 @@ end
 unless File.exists? "Makefile" and
     File.mtime("Makefile") > File.mtime(__FILE__)
   cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"] || "g++"
-  cxxflags = ENV["CXXFLAGS"] || ENV["CPPFLAGS"] ||
-             RbConfig::CONFIG["CXXFLAGS"] || RbConfig::CONFIG["CPPFLAGS"] || ""
-  cxxflags << " -fPIC"
+  cxxflags = "#{ENV["CXXFLAGS"] || ENV["CPPFLAGS"] ||
+             RbConfig::CONFIG["CXXFLAGS"] || RbConfig::CONFIG["CPPFLAGS"]} -fPIC"
 
   incdirs = [
     RbConfig::CONFIG["arch_hdrdir"],
