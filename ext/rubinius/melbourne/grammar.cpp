@@ -455,7 +455,7 @@ rb_parser_state *parser_alloc_state() {
   processor = 0;
   references = rb_ary_new();
 
-  parser_state->enc = parser_usascii_encoding();
+  parser_state->enc = parser_utf8_encoding();
 
   return parser_state;
 }
