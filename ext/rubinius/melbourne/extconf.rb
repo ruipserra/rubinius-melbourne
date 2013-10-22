@@ -101,7 +101,7 @@ unless File.exists? "Makefile" and
   dldflags = ENV["LDFLAGS"] || RbConfig::CONFIG["LDFLAGS"] || ""
   dldflags += " #{RbConfig::CONFIG["DLDFLAGS"]}"
   libpath = "-L. -L#{RbConfig::CONFIG["libdir"]}"
-  libs = RbConfig::CONFIG["LIBS"]
+  libs = "#{RbConfig::CONFIG["LIBS"]} #{RbConfig::CONFIG["LIBRUBYARG_SHARED"]}"
   install_path = Dir.pwd.sub %r[/ext/rubinius/melbourne$], "/lib/rubinius/melbourne"
 
   File.open "Makefile", "wb" do |f|
