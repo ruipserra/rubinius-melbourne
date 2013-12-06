@@ -288,6 +288,7 @@ static int scan_hex(const char *start, size_t len, size_t *retlen);
 #define call_bin_op(a, s, b)      parser_call_bin_op(parser_state, a, s, b)
 #define call_uni_op(n, s)         parser_call_uni_op(parser_state, n, s)
 #define new_args(f,o,r,p,b)       parser_new_args(parser_state, f, o, r, p, b)
+#define new_args_tail(k,kr,b)     parser_new_args_tail(parser_state, k, kr, b)
 #define negate_lit(n)             parser_negate_lit(parser_state, n)
 #define ret_args(n)               parser_ret_args(parser_state, n)
 #define assignable(a, b)          parser_assignable(parser_state, a, b)
@@ -475,12 +476,14 @@ static int scan_hex(const char *start, size_t len, size_t *retlen);
 %type <node> f_arglist f_args f_arg f_arg_item f_optarg f_marg f_marg_list f_margs
 %type <node> assoc_list assocs assoc undef_list backref string_dvar for_var
 %type <node> block_param opt_block_param block_param_def f_opt
+%type <node> f_kwarg f_kw f_block_kwarg f_block_kw
 %type <node> bv_decls opt_bv_decl bvar
 %type <node> lambda f_larglist lambda_body
 %type <node> brace_block cmd_brace_block do_block lhs none fitem
 %type <node> mlhs mlhs_head mlhs_basic mlhs_item mlhs_node mlhs_post mlhs_inner
 %type <id>   fsym keyword_variable user_variable sym symbol operation operation2 operation3
 %type <id>   cname fname op f_rest_arg f_block_arg opt_f_block_arg f_norm_arg f_bad_arg
+%type <id>   f_kwrest f_label
 
 %token tUPLUS           /* unary+ */
 %token tUMINUS          /* unary- */
@@ -507,6 +510,7 @@ static int scan_hex(const char *start, size_t len, size_t *retlen);
 %token tLBRACE          /* { */
 %token tLBRACE_ARG      /* { */
 %token tSTAR            /* * */
+%token tDSTAR           /* ** */
 %token tAMPER           /* & */
 %token tLAMBDA          /* -> */
 %token tSYMBEG tSTRING_BEG tXSTRING_BEG tREGEXP_BEG tWORDS_BEG tQWORDS_BEG
@@ -1209,6 +1213,7 @@ op              : '|'           { $$ = '|'; }
                 | '/'           { $$ = '/'; }
                 | '%'           { $$ = '%'; }
                 | tPOW          { $$ = tPOW; }
+                | tDSTAR        { $$ = tDSTAR; }
                 | '!'           { $$ = '!'; }
                 | '~'           { $$ = '~'; }
                 | tUPLUS        { $$ = tUPLUS; }
@@ -2095,6 +2100,34 @@ f_margs         : f_marg_list
                   }
                 ;
 
+block_args_tail : f_block_kwarg ',' f_kwrest opt_f_block_arg
+                  {
+                    $$ = new_args_tail($1, $3, $4);
+                  }
+                | f_block_kwarg opt_f_block_arg
+                  {
+                    $$ = new_args_tail($1, Qnone, $2);
+                  }
+                | f_kwrest opt_f_block_arg
+                  {
+                    $$ = new_args_tail(Qnone, $1, $2);
+                  }
+                | f_block_arg
+                  {
+                    $$ = new_args_tail(Qnone, Qnone, $1);
+                  }
+                ;
+
+opt_block_args_tail : ',' block_args_tail
+                  {
+                    $$ = $2;
+                  }
+                | /* none */
+                  {
+                    $$ = new_args_tail(Qnone, Qnone, Qnone);
+                  }
+                ;
+
 block_param     : f_arg ',' f_block_optarg ',' f_rest_arg opt_f_block_arg
                   {
                     $$ = new_args($1, $3, $5, 0, $6);
@@ -2790,6 +2823,34 @@ f_arglist       : '(' f_args rparen
                   }
                 ;
 
+args_tail       : f_kwarg ',' f_kwrest opt_f_block_arg
+                  {
+                    $$ = new_args_tail($1, $3, $4);
+                  }
+                | f_kwarg opt_f_block_arg
+                  {
+                    $$ = new_args_tail($1, Qnone, $2);
+                  }
+                | f_kwrest opt_f_block_arg
+                  {
+                    $$ = new_args_tail(Qnone, $1, $2);
+                  }
+                | f_block_arg
+                  {
+                    $$ = new_args_tail(Qnone, Qnone, $1);
+                  }
+                ;
+
+opt_args_tail   : ',' args_tail
+                  {
+                    $$ = $2;
+                  }
+                | /* none */
+                  {
+                    $$ = new_args_tail(Qnone, Qnone, Qnone);
+                  }
+                ;
+
 f_args          : f_arg ',' f_optarg ',' f_rest_arg opt_f_block_arg
                   {
                     $$ = new_args($1, $3, $5, 0, $6);
@@ -2903,6 +2964,82 @@ f_arg           : f_arg_item
                     $$ = $1;
                     $$->nd_plen++;
                     $$->nd_next = block_append($$->nd_next, $3->nd_next);
+                  }
+                ;
+
+f_label         : tLABEL
+                  {
+                    arg_var(formal_argument(get_id($1)));
+                    $$ = $1;
+                  }
+                ;
+
+f_kw            : f_label arg_value
+                  {
+                    $$ = assignable($1, $2);
+                    $$ = NEW_KW_ARG(0, $$);
+                  }
+                | f_label
+                  {
+                    $$ = assignable($1, (NODE *)-1);
+                    $$ = NEW_KW_ARG(0, $$);
+                  }
+                ;
+
+f_block_kw      : f_label primary_value
+                  {
+                    $$ = assignable($1, $2);
+                    $$ = NEW_KW_ARG(0, $$);
+                  }
+                | f_label
+                  {
+                    $$ = assignable($1, (NODE *)-1);
+                    $$ = NEW_KW_ARG(0, $$);
+                  }
+                ;
+
+f_block_kwarg   : f_block_kw
+                  {
+                    $$ = $1;
+                  }
+                | f_block_kwarg ',' f_block_kw
+                  {
+                    NODE *kws = $1;
+                    while (kws->nd_next) {
+                      kws = kws->nd_next;
+                    }
+                    kws->nd_next = $3;
+                    $$ = $1;
+                  }
+                ;
+
+f_kwarg         : f_kw
+                  {
+                    $$ = $1;
+                  }
+                | f_kwarg ',' f_kw
+                  {
+                    NODE *kws = $1;
+                    while (kws->nd_next) {
+                      kws = kws->nd_next;
+                    }
+                    kws->nd_next = $3;
+                    $$ = $1;
+                  }
+                ;
+
+kwrest_mark     : tPOW
+                | tDSTAR
+                ;
+
+f_kwrest        : kwrest_mark tIDENTIFIER
+                  {
+                    shadowing_lvar(get_id($2));
+                    $$ = $2;
+                  }
+                | kwrest_mark
+                  {
+                    $$ = internal_id();
                   }
                 ;
 
@@ -3047,6 +3184,10 @@ assoc           : arg_value tASSOC arg_value
                 | tLABEL arg_value
                   {
                     $$ = list_append(NEW_LIST(NEW_LIT(ID2SYM($1))), $2);
+                  }
+                | tDSTAR arg_value
+                  {
+                    $$ = list_append(NEW_LIST(0), $2);
                   }
                 ;
 
@@ -4660,7 +4801,15 @@ retry:
         return tOP_ASGN;
       }
       pushback(c);
-      c = tPOW;
+      if (IS_SPCARG(c)) {
+        rb_warning0("`**' interpreted as argument prefix");
+        c = tDSTAR;
+      } else if (IS_BEG()) {
+        c = tDSTAR;
+      } else {
+        warn_balanced("**", "argument prefix");
+        c = tPOW;
+      }
     } else {
       if(c == '=') {
         set_yylval_id('*');
@@ -6127,6 +6276,7 @@ static const struct {
   {'+',	    "+(binary)"},
   {'-',	    "-(binary)"},
   {tPOW,	  "**"},
+  {tDSTAR,  "**"},
   {tUPLUS,	"+@"},
   {tUMINUS,	"-@"},
   {tCMP,	  "<=>"},
