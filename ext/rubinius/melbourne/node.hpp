@@ -37,10 +37,29 @@ namespace MELBOURNE {
       struct RNode *node;
       ID id;
       long state;
+      struct rb_args_info *args;
       long cnt;
       VALUE value;
     } u3;
   } NODE;
+
+  struct rb_args_info {
+    NODE *pre_init;
+    NODE *post_init;
+
+    int pre_args_num;  /* count of mandatory pre-arguments */
+    int post_args_num; /* count of mandatory post-arguments */
+
+    ID first_post_arg;
+
+    ID rest_arg;
+    ID block_arg;
+
+    NODE *kw_args;
+    NODE *kw_rest_arg;
+
+    NODE *opt_args;
+  };
 
 #define RNODE(obj)  ((NODE*)(obj))
 
@@ -105,6 +124,7 @@ namespace MELBOURNE {
 #define nd_recv  u1.node
 #define nd_mid   u2.id
 #define nd_args  u3.node
+#define nd_ainfo u3.args
 
 #define nd_noex  u3.id
 #define nd_defn  u3.node
@@ -218,6 +238,7 @@ namespace MELBOURNE {
 #define NEW_ARGS(m,o)           NEW_NODE(NODE_ARGS,o,m,0)
 #define NEW_ARGS_AUX(r,b)       NEW_NODE(NODE_ARGS_AUX,r,b,0)
 #define NEW_OPT_ARG(i,v)        NEW_NODE(NODE_OPT_ARG,i,v,0)
+#define NEW_KW_ARG(i,v)         NEW_NODE(NODE_KW_ARG,i,v,0)
 #define NEW_POSTARG(i,v)        NEW_NODE(NODE_POSTARG,i,v,0)
 #define NEW_ARGSCAT(a,b)        NEW_NODE(NODE_ARGSCAT,a,b,0)
 #define NEW_ARGSPUSH(a,b)       NEW_NODE(NODE_ARGSPUSH,a,b,0)
