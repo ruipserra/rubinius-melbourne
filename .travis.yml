@@ -1,0 +1,5 @@
+language: ruby
+script: RUBYLIB=spec:lib mspec spec
+rvm:
+  - ruby-head
+  - rbx-2
