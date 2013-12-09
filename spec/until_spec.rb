@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + '/../spec_helper'
-
 describe "An Until node" do
   pre_until_sexp = [
     :until,
@@ -7,36 +5,6 @@ describe "An Until node" do
      [:call, [:call, nil, :b, [:arglist]], :+, [:arglist, [:lit, 1]]],
      true
   ]
-
-  pre_until = lambda do |g|
-    top    = g.new_label
-    rdo    = g.new_label
-    brk    = g.new_label
-    bottom = g.new_label
-
-    g.push_modifiers
-
-    top.set!
-    g.push :self
-    g.send :a, 0, true
-    g.git bottom
-
-    rdo.set!
-    g.push :self
-    g.send :b, 0, true
-    g.push 1
-    g.send :+, 1, false
-    g.pop
-
-    g.check_interrupts
-    g.goto top
-
-    bottom.set!
-    g.push :nil
-
-    brk.set!
-    g.pop_modifiers
-  end
 
   relates <<-ruby do
       while not a
@@ -47,16 +15,12 @@ describe "An Until node" do
     parse do
       pre_until_sexp
     end
-
-    compile(&pre_until)
   end
 
   relates "b + 1 while not a" do
     parse do
       pre_until_sexp
     end
-
-    compile(&pre_until)
   end
 
   relates <<-ruby do
@@ -68,16 +32,12 @@ describe "An Until node" do
     parse do
       pre_until_sexp
     end
-
-    compile(&pre_until)
   end
 
   relates "b + 1 until a" do
     parse do
       pre_until_sexp
     end
-
-    compile(&pre_until)
   end
 
   post_until_sexp = [
@@ -129,8 +89,6 @@ describe "An Until node" do
     parse do
       post_until_sexp
     end
-
-    compile(&post_until)
   end
 
   relates <<-ruby do
@@ -142,45 +100,14 @@ describe "An Until node" do
     parse do
       post_until_sexp
     end
-
-    compile(&post_until)
   end
 
   nil_condition_sexp = [:until, [:nil], [:call, nil, :a, [:arglist]], true]
-
-  nil_condition = lambda do |g|
-    top    = g.new_label
-    rdo    = g.new_label
-    brk    = g.new_label
-    bottom = g.new_label
-
-    g.push_modifiers
-    top.set!
-
-    g.push :nil
-    g.git bottom
-
-    rdo.set!
-    g.push :self
-    g.send :a, 0, true
-    g.pop
-
-    g.check_interrupts
-    g.goto top
-
-    bottom.set!
-    g.push :nil
-
-    brk.set!
-    g.pop_modifiers
-  end
 
   relates "a until ()" do
     parse do
       nil_condition_sexp
     end
-
-    compile(&nil_condition)
   end
 
   relates <<-ruby do
@@ -192,16 +119,12 @@ describe "An Until node" do
     parse do
       nil_condition_sexp
     end
-
-    compile(&nil_condition)
   end
 
   relates "a while not ()" do
     parse do
       nil_condition_sexp
     end
-
-    compile(&nil_condition)
   end
 
   relates <<-ruby do
@@ -213,7 +136,5 @@ describe "An Until node" do
     parse do
       nil_condition_sexp
     end
-
-    compile(&nil_condition)
   end
 end

@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + '/../spec_helper'
-
 describe "An Ensure node" do
   relates <<-ruby do
       begin
@@ -13,37 +11,6 @@ describe "An Ensure node" do
 
     parse do
       [:ensure, [:rescue, [:resbody, [:array], nil]], [:nil]]
-    end
-
-    compile do |g|
-      top    = g.new_label
-      dunno  = g.new_label
-      bottom = g.new_label
-
-      g.setup_unwind dunno
-
-      top.set!
-
-      g.push_modifiers
-      g.push :nil
-      g.pop_modifiers
-      g.pop_unwind
-      g.goto bottom
-
-      dunno.set!
-
-      g.push_exception
-
-      g.push :nil
-      g.pop
-
-      g.pop_exception
-      g.reraise
-
-      bottom.set!
-
-      g.push :nil
-      g.pop
     end
   end
 
@@ -74,33 +41,6 @@ describe "An Ensure node" do
           [:lit, 4]],
          [:lit, 5]]
     end
-
-    compile do |g|
-      in_rescue :SyntaxError, :Exception, :ensure, 2 do |section|
-        case section
-        when :body then
-          g.push 1
-          g.push 1
-          g.send :+, 1, false
-        when :SyntaxError then
-          g.push_exception
-          g.set_local 0
-          g.pop
-          g.push 2
-        when :Exception then
-          g.push_exception
-          g.set_local 1
-          g.pop
-          g.push 3
-        when :else then
-          g.pop         # TODO: should this be built in?
-          g.push 4
-        when :ensure then
-          g.push 5
-          g.pop
-        end
-      end
-    end
   end
 
   relates <<-ruby do
@@ -118,21 +58,6 @@ describe "An Ensure node" do
          [:rescue, [:call, nil, :a, [:arglist]], [:resbody, [:array], nil]],
          [:nil]]
     end
-
-    compile do |g|
-      in_rescue :StandardError, :ensure do |section|
-        case section
-        when :body then
-          g.push :self
-          g.send :a, 0, true
-        when :StandardError then
-          g.push :nil
-        when :ensure then
-          g.push :nil
-          g.pop
-        end
-      end
-    end
   end
 
   relates <<-ruby do
@@ -146,31 +71,6 @@ describe "An Ensure node" do
 
     parse do
       [:ensure, [:block, [:lit, 14], [:return, [:lit, 2]]], [:lit, 13]]
-    end
-
-    compile do |g|
-      ok = g.new_label
-      g.exceptions(:ensure) do |ex|
-        g.push 14
-        g.pop
-        g.push 2
-        g.ensure_return
-        ex.escape ok
-
-        ex.handle!
-        g.push_exception
-
-        g.push 13
-        g.pop
-
-        g.pop_exception
-        g.reraise
-      end
-
-      ok.set!
-
-      g.push 13
-      g.pop
     end
   end
 
@@ -192,8 +92,6 @@ describe "An Ensure node" do
        [:ensure, [:block, [:lit, 14], [:return, [:lit, 2]]], [:lit, 13]],
        [:lit, 15]]
     end
-
-    # TODO
   end
 
   relates <<-ruby do
@@ -216,6 +114,4 @@ describe "An Ensure node" do
         [:ensure, [:block, [:lit, 15], [:return, [:lit, 3]]], [:lit, 16]]]
     end
   end
-
-  # TODO
 end

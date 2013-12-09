@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + '/../spec_helper'
-
 describe "A Dstr node" do
   relates <<-ruby do
       "hello \#{}"
@@ -7,14 +5,6 @@ describe "A Dstr node" do
 
     parse do
       [:dstr, "hello ", [:str, ""]]
-    end
-
-    compile do |g|
-      g.push_literal ""
-      g.string_dup
-      g.push_literal "hello "
-      g.string_dup
-      g.string_append
     end
   end
 
@@ -27,25 +17,6 @@ describe "A Dstr node" do
       [:block,
        [:lasgn, :argl, [:lit, 1]],
        [:dstr, "x", [:evstr, [:lvar, :argl]], [:str, "y"]]]
-    end
-
-    compile do |g|
-      g.push 1
-      g.set_local 0
-      g.pop
-
-      g.push_literal "y"    # 1
-      g.string_dup
-
-      g.push_local 0        # 2
-      g.send :to_s, 0, true
-
-      g.push_literal "x"    # 3
-      g.string_dup
-
-      2.times do
-        g.string_append
-      end
     end
   end
 
@@ -61,28 +32,6 @@ describe "A Dstr node" do
         "x",
         [:evstr, [:call, [:str, "%.2f"], :%, [:arglist, [:lit, 3.14159]]]],
         [:str, "y"]]]
-    end
-
-    compile do |g|
-      g.push 1
-      g.set_local 0
-      g.pop
-
-      g.push_literal "y"    # 1
-      g.string_dup
-
-      g.push_literal "%.2f" # 2
-      g.string_dup
-      g.push_literal 3.14159
-      g.send :%, 1, false
-      g.send :to_s, 0, true
-
-      g.push_literal "x"    # 3
-      g.string_dup
-
-      2.times do
-        g.string_append
-      end
     end
   end
 
@@ -105,42 +54,6 @@ describe "A Dstr node" do
           [:arglist, [:lit, 3.14159]]]],
         [:str, "y"]]]
     end
-
-    compile do |g|
-      g.push 2
-      g.set_local 0
-      g.pop
-      g.push 1
-      g.set_local 1
-      g.pop
-
-      g.push_literal "y"  # - # 1
-      g.string_dup
-
-      g.push_literal "f"  # 1
-      g.string_dup
-
-      g.push_local 0      # 2
-      g.send :to_s, 0, true
-
-      g.push_literal "%." # 3
-      g.string_dup
-
-      2.times do
-        g.string_append
-      end
-
-      g.push_literal 3.14159      # - # 2
-      g.send :%, 1, false
-      g.send :to_s, 0, true
-
-      g.push_literal "x"  # - # 3
-      g.string_dup
-
-      2.times do
-        g.string_append
-      end
-    end
   end
 
   relates '"#{22}aa" "cd#{44}" "55" "#{66}"' do
@@ -154,33 +67,6 @@ describe "A Dstr node" do
        [:str, "55"],
        [:evstr, [:lit, 66]]]
     end
-
-    compile do |g|
-      g.push 66             # 1
-      g.send :to_s, 0, true
-
-      g.push_literal "55"   # 2
-      g.string_dup
-
-      g.push 44             # 3
-      g.send :to_s, 0, true
-
-      g.push_literal "cd"   # 4
-      g.string_dup
-
-      g.push_literal "aa"   # 5
-      g.string_dup
-
-      g.push 22             # 6
-      g.send :to_s, 0, true
-
-      g.push_literal ""     # 7
-      g.string_dup
-
-      6.times do
-        g.string_append
-      end
-    end
   end
 
   relates '"a #$global b #@ivar c #@@cvar d"' do
@@ -193,38 +79,6 @@ describe "A Dstr node" do
        [:str, " c "],
        [:evstr, [:cvar, :@@cvar]],
        [:str, " d"]]
-    end
-
-    compile do |g|
-      g.push_literal " d"           # 1
-      g.string_dup
-
-      g.push_scope                  # 2
-      g.push_literal :@@cvar
-      g.send :class_variable_get, 1
-      g.send :to_s, 0, true
-
-      g.push_literal " c "          # 3
-      g.string_dup
-
-      g.push_ivar :@ivar            # 4
-      g.send :to_s, 0, true
-
-      g.push_literal " b "          # 5
-      g.string_dup
-
-      g.push_const :Rubinius        # 6
-      g.find_const :Globals
-      g.push_literal :$global
-      g.send :[], 1
-      g.send :to_s, 0, true
-
-      g.push_literal "a "           # 7
-      g.string_dup
-
-      6.times do
-        g.string_append
-      end
     end
   end
 
@@ -241,23 +95,6 @@ EOM
        [:evstr, [:call, [:lit, 1], :+, [:arglist, [:lit, 1]]]],
        [:str, "blah\n"]]
     end
-
-    compile do |g|
-      g.push_literal "blah\n"   # 1
-      g.string_dup
-
-      g.push 1                  # 2
-      g.push 1
-      g.send :+, 1, false
-      g.send :to_s, 0, true
-
-      g.push_literal "  blah\n" # 3
-      g.string_dup
-
-      2.times do
-        g.string_append
-      end
-    end
   end
 
   relates <<-ruby do
@@ -271,22 +108,6 @@ EOF
        "def test_",
        [:evstr, [:call, nil, :action, [:arglist]]],
        [:str, "_valid_feed\n"]]
-    end
-
-    compile do |g|
-      g.push_literal "_valid_feed\n" # 1
-      g.string_dup
-
-      g.push :self                   # 2
-      g.send :action, 0, true
-      g.send :to_s, 0, true
-
-      g.push_literal "def test_"     # 3
-      g.string_dup
-
-      2.times do
-        g.string_append
-      end
     end
   end
 
@@ -305,28 +126,6 @@ EOF
        [:evstr, [:file]],
        [:str, "\n"]]
     end
-
-    compile do |g|
-      g.push_literal "\n"         # 1
-      g.string_dup
-
-      g.push_scope                # 2
-      g.send :active_path, 0
-      g.send :to_s, 0, true
-
-      g.push_literal "' s2\n"     # 3
-      g.string_dup
-
-      g.push_const :RUBY_PLATFORM # 4
-      g.send :to_s, 0, true
-
-      g.push_literal "s1 '"       # 5
-      g.string_dup
-
-      4.times do
-        g.string_append
-      end
-    end
   end
 
   relates "%Q[before [\#{nest}] after]" do
@@ -335,22 +134,6 @@ EOF
        "before [",
        [:evstr, [:call, nil, :nest, [:arglist]]],
        [:str, "] after"]]
-    end
-
-    compile do |g|
-      g.push_literal "] after"  # 1
-      g.string_dup
-
-      g.push :self              # 2
-      g.send :nest, 0, true
-      g.send :to_s, 0, true
-
-      g.push_literal "before [" # 3
-      g.string_dup
-
-      2.times do
-        g.string_append
-      end
     end
   end
 
@@ -367,40 +150,6 @@ EOF
        [:evstr, [:call, [:gvar, :$!], :class, [:arglist]]],
        [:str, ")"]]
     end
-
-    compile do |g|
-      g.push_literal ")"           # 1
-      g.string_dup
-
-      g.push_exception             # 2
-      g.send :class, 0, false
-      g.send :to_s, 0, true
-
-      g.push_literal " ("          # 3
-      g.string_dup
-
-      g.push_exception             # 4
-      g.send :message, 0, false
-      g.send :to_s, 0, true
-
-      g.push_literal ": warning: " # 5
-      g.string_dup
-
-      g.push 1                     # 6
-      g.send :to_s, 0, true
-
-      g.push_literal ":"           # 7
-      g.string_dup
-      g.push_scope                 # 8
-      g.send :active_path, 0
-      g.send :to_s, 0, true
-      g.push_literal "blah"
-      g.string_dup
-
-      8.times do
-        g.string_append
-      end
-    end
   end
 
   relates '"before #{from} middle #{to} (#{__FILE__}:#{__LINE__})"' do
@@ -415,42 +164,6 @@ EOF
        [:str, ":"],
        [:evstr, [:lit, 1]],
        [:str, ")"]]
-    end
-
-    compile do |g|
-      g.push_literal ")"        # 1
-      g.string_dup
-
-      g.push 1                  # 2
-      g.send :to_s, 0, true
-
-      g.push_literal ":"        # 3
-      g.string_dup
-
-      g.push_scope              # 4
-      g.send :active_path, 0
-      g.send :to_s, 0, true
-
-      g.push_literal " ("       # 5
-      g.string_dup
-
-      g.push :self              # 6
-      g.send :to, 0, true
-      g.send :to_s, 0, true
-
-      g.push_literal " middle " # 7
-      g.string_dup
-
-      g.push :self              # 8
-      g.send :from, 0, true
-      g.send :to_s, 0, true
-
-      g.push_literal "before "  # 9
-      g.string_dup
-
-      8.times do
-        g.string_append
-      end
     end
   end
 end

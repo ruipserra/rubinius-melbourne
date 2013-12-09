@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + '/../spec_helper'
-
 describe "A Cvasgn node" do
   relates <<-ruby do
       def x
@@ -12,15 +10,6 @@ describe "A Cvasgn node" do
        :x,
        [:args],
        [:scope, [:block, [:cvasgn, :@@blah, [:lit, 1]]]]]
-    end
-
-    compile do |g|
-      in_method :x do |d|
-        d.push_scope
-        d.push_literal :@@blah
-        d.push 1
-        d.send :class_variable_set, 2
-      end
     end
   end
 
@@ -36,16 +25,6 @@ describe "A Cvasgn node" do
        :quiet_mode=,
        [:args, :boolean],
        [:scope, [:block, [:cvasgn, :@@quiet_mode, [:lvar, :boolean]]]]]
-    end
-
-    compile do |g|
-      g.push :self
-      in_method :quiet_mode=, :singleton do |d|
-        d.push_scope
-        d.push_literal :@@quiet_mode
-        d.push_local 0
-        d.send :class_variable_set, 2
-      end
     end
   end
 end

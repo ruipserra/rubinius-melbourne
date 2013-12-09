@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + '/../spec_helper'
-
 describe "A Flip2 node" do
   relates <<-ruby do
       x = if ((i % 4) == 0)..((i % 3) == 0) then
@@ -25,8 +23,6 @@ describe "A Flip2 node" do
         [:call, nil, :i, [:arglist]],
         [:nil]]]
     end
-
-    # flip2
   end
 
   relates <<-ruby do
@@ -43,7 +39,5 @@ describe "A Flip2 node" do
        [:nil],
        nil]
     end
-
-    # flip2 method
   end
 end
