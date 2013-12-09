@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency      "rubinius-toolset"
 
+  spec.add_development_dependency  "redcard", "~> 1.0"
   spec.add_development_dependency  "mspec", "~> 1.5"
   spec.add_development_dependency  "rake",  "~> 10.0"
 end
