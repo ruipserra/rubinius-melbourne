@@ -693,11 +693,24 @@ namespace MELBOURNE {
       tree = rb_funcall(ptp, rb_sOptArg, 2, line, args);
       break;
     }
+    case NODE_KW_ARG: {
+      VALUE args = rb_ary_new();
+
+      do {
+        rb_ary_push(args, process_parse_tree(parser_state, ptp, node->nd_body, locals));
+        node = node->nd_next;
+      } while(node);
+
+      tree = rb_funcall(ptp, rb_sKwArg, 2, line, args);
+      break;
+    }
     case NODE_ARGS: {
       VALUE args = Qnil;
       VALUE opts = Qnil;
       VALUE splat = Qnil;
       VALUE post = Qnil;
+      VALUE kwargs = Qnil;
+      VALUE kwrest = Qnil;
       VALUE block = Qnil;
 
       int total_args = 0;
@@ -760,7 +773,11 @@ namespace MELBOURNE {
         opts = process_parse_tree(parser_state, ptp, ainfo->opt_args, locals);
       }
 
-      if(INTERNAL_ID_P(ainfo->rest_arg)) {
+      if(ainfo->kw_args) {
+        kwargs = process_parse_tree(parser_state, ptp, ainfo->kw_args, locals);
+      }
+
+      if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
         splat = Qtrue;
       } else if(ainfo->rest_arg) {
         if(ainfo->rest_arg == 1) {
@@ -768,6 +785,17 @@ namespace MELBOURNE {
           splat = Qfalse;
         } else {
           splat = ID2SYM(ainfo->rest_arg);
+        }
+      }
+
+      if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
+        kwrest = Qtrue;
+      } else if(ainfo->kw_rest_arg->nd_vid) {
+        if(ainfo->kw_rest_arg->nd_vid == 1) {
+          // m { |a,| ... }
+          kwrest = Qfalse;
+        } else {
+          kwrest = ID2SYM(ainfo->kw_rest_arg->nd_vid);
         }
       }
 
@@ -803,7 +831,7 @@ namespace MELBOURNE {
         }
       }
 
-      tree = rb_funcall(ptp, rb_sArgs, 6, line, args, opts, splat, post, block);
+      tree = rb_funcall(ptp, rb_sArgs, 8, line, args, opts, splat, post, kwargs, kwrest, block);
       break;
     }
     case NODE_LVAR:
