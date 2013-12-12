@@ -2910,7 +2910,8 @@ f_args          : f_arg ',' f_optarg ',' f_rest_arg opt_args_tail
                   }
                 | /* none */
                   {
-                    $$ = new_args(0, 0, 0, 0, 0);
+                    $$ = new_args_tail(0, 0, 0);
+                    $$ = new_args(0, 0, 0, 0, $$);
                   }
                 ;
 
@@ -7089,7 +7090,6 @@ parser_new_args(rb_parser_state* parser_state, NODE *m, NODE *o, ID r, NODE *p, 
   args->opt_args       = o;
 
   sourceline = saved_line;
-  
   return tail;
 }
 
