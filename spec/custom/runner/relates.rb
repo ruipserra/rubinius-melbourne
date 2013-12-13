@@ -49,7 +49,7 @@ class SpecDataRelation
   # characters.
   def format(ruby)
     if /\n/ =~ ruby
-      lines = ruby.rstrip.to_a
+      lines = ruby.rstrip.lines
       if /( *)/ =~ lines.first
         if $1.size > 4
           dedent = $1.size - 4
@@ -72,19 +72,6 @@ class SpecDataRelation
     ruby = @ruby
     it "is parsed from #{format ruby}" do
       ruby.should parse_as(block.call)
-    end
-  end
-
-  # Creates spec example blocks if the compile process is enabled.
-  def compile(*plugins, &block)
-    return unless self.class.enabled? :compiler
-
-    ruby = @ruby
-    it "is compiled from #{format ruby}" do
-      generator = TestGenerator.new
-      generator.instance_eval(&block)
-
-      ruby.should compile_as(generator, *plugins)
     end
   end
 end

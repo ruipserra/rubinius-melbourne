@@ -22,7 +22,6 @@ end
 
 class Object
   def parse_as(sexp)
-    # Sorry, you sexp little specs
-    # ParseAsMatcher.new sexp
+    ParseAsMatcher.new sexp
   end
 end
