@@ -1,5 +1,14 @@
 language: ruby
-script: RUBYLIB=spec:lib mspec spec
+env:
+  - MELBOURNE_SPEC_VERSION=1 RUBYLIB=lib:.
+  - MELBOURNE_SPEC_VERSION=1 RUBYLIB=.
+script: bundle exec mspec spec
 rvm:
-  - ruby-head
+  - 2.0.0
   - rbx-2
+matrix:
+  exclude:
+    - rvm: ruby-head
+      env: MELBOURNE_SPEC_VERSION=1 RUBYLIB=lib:.
+    - rvm: rbx-2
+      env: MELBOURNE_SPEC_VERSION=1 RUBYLIB=.
