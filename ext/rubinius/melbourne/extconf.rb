@@ -35,6 +35,7 @@ unless File.exists? "Makefile" and
 
   incdirs = [
     RbConfig::CONFIG["arch_hdrdir"],
+    RbConfig::CONFIG["rubyarchhdrdir"],
     RbConfig::CONFIG["topdir"],
     RbConfig::CONFIG["hdrdir"],
     RbConfig::CONFIG["rubyhdrdir"],
