@@ -24,7 +24,7 @@ describe "A Yield node" do
   end
 
   parse "yield([*[]])" do
-    # TODO
+    [:yield, [:array, [:splat, [:array]]]]
   end
 
   parse "yield([*[1]])" do
