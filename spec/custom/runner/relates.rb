@@ -80,4 +80,8 @@ class Object
   def relates(str, &block)
     SpecDataRelation.new(str).instance_eval(&block)
   end
+
+  def parse(str, &block)
+    SpecDataRelation.new(str).parse(&block)
+  end
 end
