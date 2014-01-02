@@ -1,40 +1,35 @@
 describe "An Alias node" do
-  relates <<-ruby do
+  parse <<-ruby do
       class X
         alias :y :x
       end
     ruby
 
-    parse do
-      [:class, :X, nil, [:scope, [:alias, [:lit, :y], [:lit, :x]]]]
-    end
+    [:class, :X, nil, [:scope, [:block, [:alias, [:lit, :y], [:lit, :x]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       class X
         alias y x
       end
     ruby
 
-    parse do
-      [:class, :X, nil, [:scope, [:alias, [:lit, :y], [:lit, :x]]]]
-    end
+    [:class, :X, nil, [:scope, [:block, [:alias, [:lit, :y], [:lit, :x]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       class X
         alias :"y\#{1}" :"x\#{2}"
       end
     ruby
 
-    parse do
-      [:class,
-       :X,
-       nil,
-       [:scope,
-        [:alias,
-         [:dsym, "y", [:evstr, [:lit, 1]]],
-         [:dsym, "x", [:evstr, [:lit, 2]]]]]]
-    end
+    [:class,
+     :X,
+     nil,
+     [:scope,
+      [:block,
+       [:alias,
+        [:dsym, "y", [:evstr, [:lit, 1]]],
+        [:dsym, "x", [:evstr, [:lit, 2]]]]]]]
   end
 end
