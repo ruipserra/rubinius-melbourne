@@ -1,81 +1,55 @@
 describe "An Array node" do
-  relates '[1, :b, "c"]' do
-    parse do
-      [:array, [:lit, 1], [:lit, :b], [:str, "c"]]
-    end
+  parse '[1, :b, "c"]' do
+    [:array, [:lit, 1], [:lit, :b], [:str, "c"]]
   end
 
-  relates "%w[a b c]" do
-    parse do
-      [:array, [:str, "a"], [:str, "b"], [:str, "c"]]
-    end
+  parse "%w[a b c]" do
+    [:array, [:str, "a"], [:str, "b"], [:str, "c"]]
   end
 
-  relates '%w[a #{@b} c]' do
-    parse do
-      [:array, [:str, "a"], [:str, "\#{@b}"], [:str, "c"]]
-    end
+  parse '%w[a #{@b} c]' do
+    [:array, [:str, "a"], [:str, "\#{@b}"], [:str, "c"]]
   end
 
-  relates "%W[a b c]" do
-    parse do
-      [:array,
-        [:str, "a"], [:str, "b"], [:str, "c"]]
-    end
+  parse "%W[a b c]" do
+    [:array,
+      [:str, "a"], [:str, "b"], [:str, "c"]]
   end
 
-  relates '%W[a #{@b} c]' do
-    parse do
-      [:array,
-        [:str, "a"],
-        [:dstr, "", [:evstr, [:ivar, :@b]]],
-        [:str, "c"]]
-    end
+  parse '%W[a #{@b} c]' do
+    [:array,
+      [:str, "a"],
+      [:dstr, "", [:evstr, [:ivar, :@b]]],
+      [:str, "c"]]
   end
 
-  relates "[*[1]]" do
-    parse do
-      [:array, [:splat, [:array, [:lit, 1]]]]
-    end
+  parse "[*[1]]" do
+    [:splat, [:array, [:lit, 1]]]
   end
 
-  relates "[*1]" do
-    parse do
-      [:array, [:splat, [:lit, 1]]]
-    end
+  parse "[*1]" do
+    [:splat, [:lit, 1]]
   end
 
-  relates "[[*1]]" do
-    parse do
-      [:array, [:array, [:splat, [:lit, 1]]]]
-    end
+  parse "[[*1]]" do
+    [:array, [:splat, [:lit, 1]]]
   end
 
-  relates "[1, *2]" do
-    parse do
-      [:array, [:lit, 1], [:splat, [:lit, 2]]]
-    end
+  parse "[1, *2]" do
+    [:argscat, [:array, [:lit, 1]], [:lit, 2]]
   end
 
-  relates "[1, *c()]" do
-    parse do
-      [:array, [:lit, 1], [:splat, [:call, nil, :c, [:arglist]]]]
-    end
-
-    # TODO
+  parse "[1, *c()]" do
+    [:argscat, [:array, [:lit, 1]], [:call, nil, :c, [:arglist]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       x = [2]
       [1, *x]
     ruby
 
-    parse do
-      [:block,
-       [:lasgn, :x, [:array, [:lit, 2]]],
-       [:array, [:lit, 1], [:splat, [:lvar, :x]]]]
-    end
-
-    # TODO
+    [:block,
+     [:lasgn, :x, [:array, [:lit, 2]]],
+     [:argscat, [:array, [:lit, 1]], [:lvar, :x]]]
   end
 end
