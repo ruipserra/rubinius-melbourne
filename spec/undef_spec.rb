@@ -1,98 +1,83 @@
 describe "An Undef node" do
-  relates "undef :x" do
-    parse do
-      [:undef, [:lit, :x]]
-    end
+  parse "undef :x" do
+    [:undef, [:lit, :x]]
   end
 
-  relates "undef :x, :y" do
-    parse do
-      [:block, [:undef, [:lit, :x]], [:undef, [:lit, :y]]]
-    end
+  parse "undef :x, :y" do
+    [:block, [:undef, [:lit, :x]], [:undef, [:lit, :y]]]
   end
 
-  relates "undef :x, :y, :z" do
-    parse do
-      [:block, [:undef, [:lit, :x]], [:undef, [:lit, :y]], [:undef, [:lit, :z]]]
-    end
+  parse "undef :x, :y, :z" do
+    [:block, [:undef, [:lit, :x]], [:undef, [:lit, :y]], [:undef, [:lit, :z]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       f1
       undef :x
     ruby
 
-    parse do
-      [:block, [:call, nil, :f1, [:arglist]], [:undef, [:lit, :x]]]
-    end
+    [:block, [:call, nil, :f1, [:arglist]], [:undef, [:lit, :x]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       f1
       undef :x, :y
     ruby
 
-    parse do
-      [:block,
-       [:call, nil, :f1, [:arglist]],
-       [:block, [:undef, [:lit, :x]], [:undef, [:lit, :y]]]]
-    end
+    [:block,
+     [:call, nil, :f1, [:arglist]],
+     [:undef, [:lit, :x]],
+     [:undef, [:lit, :y]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       undef :x, :y, :z
       f2
     ruby
 
-    parse do
-      [:block,
-       [:undef, [:lit, :x]],
-       [:undef, [:lit, :y]],
-       [:undef, [:lit, :z]],
-       [:call, nil, :f2, [:arglist]]]
-    end
+    [:block,
+     [:undef, [:lit, :x]],
+     [:undef, [:lit, :y]],
+     [:undef, [:lit, :z]],
+     [:call, nil, :f2, [:arglist]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       f1
       undef :x, :y, :z
     ruby
 
-    parse do
-      [:block,
-       [:call, nil, :f1, [:arglist]],
-       [:block, [:undef, [:lit, :x]], [:undef, [:lit, :y]], [:undef, [:lit, :z]]]]
-    end
+    [:block,
+     [:call, nil, :f1, [:arglist]],
+     [:undef, [:lit, :x]],
+     [:undef, [:lit, :y]],
+     [:undef, [:lit, :z]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       f1
       undef :x, :y, :z
       f2
     ruby
 
-    parse do
-      [:block,
-       [:call, nil, :f1, [:arglist]],
-       [:block, [:undef, [:lit, :x]], [:undef, [:lit, :y]], [:undef, [:lit, :z]]],
-       [:call, nil, :f2, [:arglist]]]
-    end
+    [:block,
+     [:call, nil, :f1, [:arglist]],
+     [:undef, [:lit, :x]],
+     [:undef, [:lit, :y]],
+     [:undef, [:lit, :z]],
+     [:call, nil, :f2, [:arglist]]]
   end
 
-  relates "class B; undef :blah; end" do
-    parse do
-      [:class, :B, nil, [:scope, [:undef, [:lit, :blah]]]]
-    end
+  parse "class B; undef :blah; end" do
+    [:class, :B, nil, [:scope, [:block, [:undef, [:lit, :blah]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       undef :"x\#{1}", :"x\#{2}"
     ruby
 
-    parse do
-      [:block,
-        [:undef, [:dsym, "x", [:evstr, [:lit, 1]]]],
-        [:undef, [:dsym, "x", [:evstr, [:lit, 2]]]]]
-    end
+    [:block,
+      [:undef, [:dsym, "x", [:evstr, [:lit, 1]]]],
+      [:undef, [:dsym, "x", [:evstr, [:lit, 2]]]]]
   end
 end
