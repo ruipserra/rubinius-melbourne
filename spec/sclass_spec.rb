@@ -1,16 +1,14 @@
 describe "An Sclass node" do
-  relates <<-ruby do
+  parse <<-ruby do
       class << self
         42
       end
     ruby
 
-    parse do
-      [:sclass, [:self], [:scope, [:lit, 42]]]
-    end
+    [:sclass, [:self], [:scope, [:block, [:lit, 42]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       class A
         class << self
           a
@@ -20,36 +18,39 @@ describe "An Sclass node" do
       end
     ruby
 
-    parse do
-      [:class,
-       :A,
-       nil,
-       [:scope,
-        [:block,
-         [:sclass, [:self], [:scope, [:call, nil, :a, [:arglist]]]],
-         [:class, :B, nil, [:scope]]]]]
-    end
+    [:class,
+     :A,
+     nil,
+     [:scope,
+      [:block,
+       [:sclass, [:self], [:scope, [:block, [:call, nil, :a, [:arglist]]]]],
+       [:class, :B, nil, [:scope]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       x = "a"
       class << x
       end
     ruby
 
-    parse do
-      [:block,
-        [:lasgn, :x, [:str, "a"]],
-        [:sclass, [:lvar, :x], [:scope]]]
-    end
+    [:block,
+      [:lasgn, :x, [:str, "a"]],
+      [:sclass, [:lvar, :x], [:scope]]]
   end
 
-  relates <<-ruby do
-    x = "a"
-    m do
-      class << x
+  parse <<-ruby do
+      x = "a"
+      m do
+        class << x
+        end
       end
-    end
     ruby
+
+    [:block,
+     [:lasgn, :x, [:str, "a"]],
+     [:call,
+      nil,
+      :m,
+      [:arglist, [:iter, [:args], [:sclass, [:lvar, :x], [:scope]]]]]]
   end
 end
