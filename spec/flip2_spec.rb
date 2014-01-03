@@ -21,7 +21,7 @@ describe "A Flip2 node" do
           :==,
           [:arglist, [:lit, 0]]]],
         [:call, nil, :i, [:arglist]],
-        [:nil]]]
+        nil]]
     end
   end
 
