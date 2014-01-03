@@ -1,30 +1,35 @@
 describe "A Cvasgn node" do
-  relates <<-ruby do
+  parse <<-ruby do
       def x
         @@blah = 1
       end
     ruby
 
-    parse do
-      [:defn,
-       :x,
-       [:args],
-       [:scope, [:block, [:cvasgn, :@@blah, [:lit, 1]]]]]
-    end
+    [:defn,
+     :x,
+     [:args],
+     [:scope, [:block, [:cvasgn, :@@blah, [:lit, 1]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       def self.quiet_mode=(boolean)
         @@quiet_mode = boolean
       end
     ruby
 
-    parse do
-      [:defs,
-       [:self],
-       :quiet_mode=,
-       [:args, :boolean],
-       [:scope, [:block, [:cvasgn, :@@quiet_mode, [:lvar, :boolean]]]]]
-    end
+    [:defs,
+     [:self],
+     :quiet_mode=,
+     [:args, :boolean],
+     [:scope, [:block, [:cvasgn, :@@quiet_mode, [:lvar, :boolean]]]]]
+  end
+
+  parse <<-ruby do
+      class X
+        @@blah = 1
+      end
+    ruby
+
+    [:class, :X, nil, [:scope, [:block, [:cvasgn, :@@blah, [:lit, 1]]]]]
   end
 end
