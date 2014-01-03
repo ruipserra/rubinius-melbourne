@@ -1,29 +1,23 @@
 describe "A Cvar node" do
-  relates "@@x" do
-    parse do
-      [:cvar, :@@x]
-    end
+  parse "@@x" do
+    [:cvar, :@@x]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       class A
         @@a
       end
     ruby
 
-    parse do
-      [:class, :A, nil, [:scope, [:cvar, :@@a]]]
-    end
+    [:class, :A, nil, [:scope, [:block, [:cvar, :@@a]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       module M
         @@a
       end
     ruby
 
-    parse do
-      [:module, :M, [:scope, [:cvar, :@@a]]]
-    end
+    [:module, :M, [:scope, [:block, [:cvar, :@@a]]]]
   end
 end
