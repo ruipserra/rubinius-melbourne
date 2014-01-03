@@ -1,52 +1,38 @@
 describe "A Dregx node" do
-  relates <<-ruby do
+  parse <<-ruby do
       /(\#{})/
     ruby
 
-    parse do
-      [:dregx, "(", [:str, ""], [:str, ")"]]
-    end
+    [:dregx, "(", [:evstr, [:nil]], [:str, ")"]]
   end
 
-  relates "/x\#{(1 + 1)}y/" do
-    parse do
-      [:dregx,
-       "x",
-       [:evstr, [:call, [:lit, 1], :+, [:arglist, [:lit, 1]]]],
-       [:str, "y"]]
-    end
+  parse "/x\#{(1 + 1)}y/" do
+    [:dregx,
+     "x",
+     [:evstr, [:call, [:lit, 1], :+, [:arglist, [:lit, 1]]]],
+     [:str, "y"]]
   end
 
-  relates "/a\#{}b/" do
-    parse do
-      [:dregx, "a", [:str, ""], [:str, "b"]]
-    end
+  parse "/a\#{}b/" do
+    [:dregx, "a", [:evstr, [:nil]], [:str, "b"]]
   end
 
-  relates "/\#{@rakefile}/" do
-    parse do
-      [:dregx, "", [:evstr, [:ivar, :@rakefile]]]
-    end
+  parse "/\#{@rakefile}/" do
+    [:dregx, "", [:evstr, [:ivar, :@rakefile]]]
   end
 
-  relates "/\#{1}/n" do
-    parse do
-      [:dregx, "", [:evstr, [:lit, 1]], 16]
-    end
+  parse "/\#{1}/n" do
+    [:dregx, "", [:evstr, [:lit, 1]], 512]
   end
 
-  relates "/\#{IAC}\#{SB}/no" do
-    parse do
-      [:dregx_once, "", [:evstr, [:const, :IAC]], [:evstr, [:const, :SB]], 16]
-    end
+  parse "/\#{IAC}\#{SB}/no" do
+    [:dregx_once, "", [:evstr, [:const, :IAC]], [:evstr, [:const, :SB]], 512]
   end
 
-  relates "/x\#{(1 + 1)}y/o" do
-    parse do
-      [:dregx_once,
-       "x",
-       [:evstr, [:call, [:lit, 1], :+, [:arglist, [:lit, 1]]]],
-       [:str, "y"]]
-    end
+  parse "/x\#{(1 + 1)}y/o" do
+    [:dregx_once,
+     "x",
+     [:evstr, [:call, [:lit, 1], :+, [:arglist, [:lit, 1]]]],
+     [:str, "y"]]
   end
 end
