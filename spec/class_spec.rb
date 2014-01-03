@@ -33,7 +33,7 @@ describe "A Class node" do
     ruby
 
     parse do
-      [:class, [:colon3, :Y], nil, [:scope, [:call, nil, :c, [:arglist]]]]
+      [:class, [:colon3, :Y], nil, [:scope, [:block, [:call, nil, :c, [:arglist]]]]]
     end
   end
 
@@ -47,7 +47,7 @@ describe "A Class node" do
       [:class,
        [:colon2, [:const, :X], :Y],
        nil,
-       [:scope, [:call, nil, :c, [:arglist]]]]
+       [:scope, [:block, [:call, nil, :c, [:arglist]]]]]
     end
   end
 
