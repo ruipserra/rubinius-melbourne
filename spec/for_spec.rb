@@ -1,55 +1,50 @@
 describe "A For node" do
-  relates <<-ruby do
+  parse <<-ruby do
       for o in ary do
         puts(o)
       end
     ruby
 
-    parse do
-      [:for,
-       [:call, nil, :ary, [:arglist]],
-       [:lasgn, :o],
-       [:call, nil, :puts, [:arglist, [:lvar, :o]]]]
-    end
+    [:for,
+     [:lasgn, :o],
+     [:call, nil, :ary, [:arglist]],
+     [:call, nil, :puts, [:arglist, [:lvar, :o]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       for i in (0..max) do
         # do nothing
       end
     ruby
 
-    parse do
-      [:for, [:dot2, [:lit, 0], [:call, nil, :max, [:arglist]]], [:lasgn, :i]]
-    end
+    [:for,
+     [:lasgn, :i],
+     [:dot2, [:lit, 0], [:call, nil, :max, [:arglist]]],
+     [:nil]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       for a, b in x do
         5
       end
     ruby
 
-    parse do
-      [:for,
-       [:call, nil, :x, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:lasgn, :b]]],
-       [:lit, 5]]
-    end
+    [:for,
+     [:masgn, [:array, [:lasgn, :a], [:lasgn, :b]]],
+     [:call, nil, :x, [:arglist]],
+     [:lit, 5]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       for i in ()
         i
       end
     ruby
 
-    parse do
-      [:for, [:nil], [:lasgn, :i], [:lvar, :i]]
-    end
+    [:for, [:lasgn, :i], [:nil], [:lvar, :i]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       c = 1
       for i in a
         for j in b
@@ -57,5 +52,12 @@ describe "A For node" do
         end
       end
     ruby
+
+    [:block,
+     [:lasgn, :c, [:lit, 1]],
+     [:for,
+      [:lasgn, :i],
+      [:call, nil, :a, [:arglist]],
+      [:for, [:lasgn, :j], [:call, nil, :b, [:arglist]], [:lvar, :c]]]]
   end
 end
