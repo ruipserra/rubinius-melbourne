@@ -29,7 +29,7 @@ describe "A Masgn node" do
     parse do
       [:masgn,
        [:array, [:lasgn, :a], [:lasgn, :b], [:splat, [:lasgn, :c]]],
-       [:array, [:lit, 1], [:lit, 2], [:splat, [:array, [:lit, 3], [:lit, 4]]]]]
+       [:array, [:lit, 1], [:lit, 2], [:lit, 3], [:lit, 4]]]
     end
   end
 
@@ -110,7 +110,7 @@ describe "A Masgn node" do
       [:masgn,
        [:array,
         [:splat, [:attrasgn, [:call, nil, :a, [:arglist]], :m=, [:arglist]]]],
-       [:to_ary, [:call, nil, :b, [:arglist]]]]
+       [:array, [:call, nil, :b, [:arglist]]]]
     end
   end
 
@@ -132,7 +132,7 @@ describe "A Masgn node" do
     parse do
       [:masgn,
        [:array, [:splat, [:gasgn, :$a]]],
-       [:to_ary, [:call, nil, :b, [:arglist]]]]
+       [:array, [:call, nil, :b, [:arglist]]]]
     end
   end
 
@@ -156,7 +156,7 @@ describe "A Masgn node" do
     parse do
       [:masgn,
        [:array, [:splat, [:iasgn, :@a]]],
-       [:to_ary, [:call, nil, :b, [:arglist]]]]
+       [:array, [:call, nil, :b, [:arglist]]]]
     end
   end
 
@@ -187,7 +187,7 @@ describe "A Masgn node" do
   relates "@@a, @@b = 1, 2" do
     parse do
       [:masgn,
-       [:array, [:cvdecl, :@@a], [:cvdecl, :@@b]],
+       [:array, [:cvasgn, :@@a], [:cvasgn, :@@b]],
        [:array, [:lit, 1], [:lit, 2]]]
     end
   end
@@ -220,7 +220,7 @@ describe "A Masgn node" do
     parse do
       [:masgn,
        [:array, [:lasgn, :a], [:lasgn, :b], [:lasgn, :c]],
-       [:array, [:lit, 1], [:splat, [:call, nil, :d, [:arglist]]]]]
+       [:argscat, [:array, [:lit, 1]], [:call, nil, :d, [:arglist]]]]
     end
   end
 
@@ -244,7 +244,7 @@ describe "A Masgn node" do
     parse do
       [:masgn,
        [:array, [:splat, [:lasgn, :a]]],
-       [:to_ary, [:call, nil, :b, [:arglist]]]]
+       [:array, [:call, nil, :b, [:arglist]]]]
     end
   end
 
@@ -341,14 +341,17 @@ describe "A Masgn node" do
     ruby
 
     parse do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
+       [:args],
        [:block,
         [:masgn,
          [:array, [:lasgn, :a], [:lasgn, :b]],
          [:array, [:lit, 1], [:lit, 2]]],
-        [:next]]]
+        [:next]]]]]
     end
   end
 
