@@ -1,25 +1,19 @@
 describe "A Iasgn node" do
-  relates "@a = 4" do
-    parse do
-      [:iasgn, :@a, [:lit, 4]]
-    end
+  parse "@a = 4" do
+    [:iasgn, :@a, [:lit, 4]]
   end
 
-  relates "@a = *[1]" do
-    parse do
-      [:iasgn, :@a, [:svalue, [:splat, [:array, [:lit, 1]]]]]
-    end
+  parse "@a = *[1]" do
+    [:iasgn, :@a, [:splat, [:array, [:lit, 1]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = 1
       @a = a
     ruby
 
-    parse do
-      [:block,
-        [:lasgn, :a, [:lit, 1]],
-        [:iasgn, :@a, [:lvar, :a]]]
-    end
+    [:block,
+      [:lasgn, :a, [:lit, 1]],
+      [:iasgn, :@a, [:lvar, :a]]]
   end
 end
