@@ -451,7 +451,7 @@ describe "A Defn node" do
             [:call, nil, :do_stuff, [:arglist]],
             [:resbody,
              [:array, [:const, :RuntimeError], [:lasgn, :b, [:gvar, :$!]]],
-             [[:call, nil, :puts, [:arglist, [:lvar, :b]]]]]]]]]]]]]
+             [:call, nil, :puts, [:arglist, [:lvar, :b]]]]]]]]]]]]
   end
 
   parse <<-ruby do
