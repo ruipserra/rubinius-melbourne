@@ -1,23 +1,23 @@
 describe "A Rescue node" do
-  relates "blah rescue nil" do
-    parse do
-      [:rescue, [:call, nil, :blah, [:arglist]], [:resbody, [:array], [:nil]]]
-    end
+  parse "blah rescue nil" do
+    [:rescue,
+     [:call, nil, :blah, [:arglist]],
+     [:resbody, [:array, [:const, :StandardError]], [:nil]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         blah
       rescue
       end
     ruby
 
-    parse do
-      [:rescue, [:call, nil, :blah, [:arglist]], [:resbody, [:array], nil]]
-    end
+    [:rescue,
+     [:call, nil, :blah, [:arglist]],
+     [:resbody, [:array, [:const, :StandardError]], [:nil]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         a
       rescue A
@@ -29,16 +29,18 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:call, nil, :a, [:arglist]],
-       [:resbody, [:array, [:const, :A]], [:call, nil, :b, [:arglist]]],
-       [:resbody, [:array, [:const, :B]], [:call, nil, :c, [:arglist]]],
-       [:resbody, [:array, [:const, :C]], [:call, nil, :d, [:arglist]]]]
-    end
+    [:rescue,
+     [:call, nil, :a, [:arglist]],
+     [:resbody,
+      [:array, [:const, :A]],
+      [:call, nil, :b, [:arglist]],
+      [:resbody,
+       [:array, [:const, :B]],
+       [:call, nil, :c, [:arglist]],
+       [:resbody, [:array, [:const, :C]], [:call, nil, :d, [:arglist]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         a
       rescue => @e
@@ -47,16 +49,14 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:call, nil, :a, [:arglist]],
-       [:resbody,
-        [:array, [:iasgn, :@e, [:gvar, :$!]]],
-        [:block, [:call, nil, :c, [:arglist]], [:call, nil, :d, [:arglist]]]]]
-    end
+    [:rescue,
+     [:call, nil, :a, [:arglist]],
+     [:resbody,
+      [:array, [:const, :StandardError], [:iasgn, :@e, [:gvar, :$!]]],
+      [[:call, nil, :c, [:arglist]], [:call, nil, :d, [:arglist]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         a
       rescue => e
@@ -65,16 +65,14 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:call, nil, :a, [:arglist]],
-       [:resbody,
-        [:array, [:lasgn, :e, [:gvar, :$!]]],
-        [:block, [:call, nil, :c, [:arglist]], [:call, nil, :d, [:arglist]]]]]
-    end
+    [:rescue,
+     [:call, nil, :a, [:arglist]],
+     [:resbody,
+      [:array, [:const, :StandardError], [:lasgn, :e, [:gvar, :$!]]],
+      [[:call, nil, :c, [:arglist]], [:call, nil, :d, [:arglist]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         a
       rescue => mes
@@ -88,46 +86,48 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:block,
-         [:rescue,
-          [:call, nil, :a, [:arglist]],
-          [:resbody, [:array, [:lasgn, :mes, [:gvar, :$!]]], nil]],
-         [:rescue,
-          [:call, nil, :b, [:arglist]],
-          [:resbody, [:array, [:lasgn, :mes, [:gvar, :$!]]], nil]]]
-    end
+    [:block,
+     [:rescue,
+      [:call, nil, :a, [:arglist]],
+      [:resbody,
+       [:array, [:const, :StandardError], [:lasgn, :mes, [:gvar, :$!]]],
+       [:nil]]],
+     [:rescue,
+      [:call, nil, :b, [:arglist]],
+      [:resbody,
+       [:array, [:const, :StandardError], [:lasgn, :mes, [:gvar, :$!]]],
+       [:nil]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         blah
       rescue RuntimeError => r
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:call, nil, :blah, [:arglist]],
-       [:resbody,
-        [:array, [:const, :RuntimeError], [:lasgn, :r, [:gvar, :$!]]],
-        nil]]
-    end
+    [:rescue,
+     [:call, nil, :blah, [:arglist]],
+     [:resbody,
+      [:array, [:const, :RuntimeError], [:lasgn, :r, [:gvar, :$!]]],
+      [:nil]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue => @e
       end
     ruby
 
-    parse do
-      [:rescue, [:lit, 1], [:resbody, [:array, [:iasgn, :@e, [:gvar, :$!]]], nil]]
-    end
+    [:rescue,
+     [:lit, 1],
+     [:resbody,
+      [:array, [:const, :StandardError], [:iasgn, :@e, [:gvar, :$!]]],
+      [:nil]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue
@@ -135,24 +135,26 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue, [:lit, 1], [:resbody, [:array], [:lasgn, :var, [:lit, 2]]]]
-    end
+    [:rescue,
+     [:lit, 1],
+     [:resbody, [:array, [:const, :StandardError]], [:lasgn, :var, [:lit, 2]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue => e
       end
     ruby
 
-    parse do
-      [:rescue, [:lit, 1], [:resbody, [:array, [:lasgn, :e, [:gvar, :$!]]], nil]]
-    end
+    [:rescue,
+     [:lit, 1],
+     [:resbody,
+      [:array, [:const, :StandardError], [:lasgn, :e, [:gvar, :$!]]],
+      [:nil]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue
@@ -160,16 +162,14 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 1],
-       [:resbody,
-        [:array],
-        [:attrasgn, [:call, nil, :a, [:arglist]], :b=, [:arglist, [:nil]]]]]
-    end
+    [:rescue,
+     [:lit, 1],
+     [:resbody,
+      [:array, [:const, :StandardError]],
+      [:attrasgn, [:call, nil, :a, [:arglist]], :b=, [:arglist, [:nil]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue => e
@@ -177,14 +177,14 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 1],
-       [:resbody, [:array, [:lasgn, :e, [:gvar, :$!]]], [:lasgn, :var, [:lit, 2]]]]
-    end
+    [:rescue,
+     [:lit, 1],
+     [:resbody,
+      [:array, [:const, :StandardError], [:lasgn, :e, [:gvar, :$!]]],
+      [:lasgn, :var, [:lit, 2]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         12
       rescue String
@@ -194,15 +194,13 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 12],
-       [:resbody, [:array, [:const, :String]], [:lit, 13]],
-       [:lit, 14]]
-    end
+    [:rescue,
+     [:lit, 12],
+     [:resbody, [:array, [:const, :String]], [:lit, 13]],
+     [:lit, 14]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         12
       rescue *blah
@@ -210,14 +208,12 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 12],
-       [:resbody, [:splat, [:call, nil, :blah, [:arglist]]], [:lit, 13]]]
-    end
+    [:rescue,
+     [:lit, 12],
+     [:resbody, [:splat, [:call, nil, :blah, [:arglist]]], [:lit, 13]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         12
       rescue String, *blah
@@ -225,16 +221,14 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 12],
-       [:resbody,
-        [:array, [:const, :String], [:splat, [:call, nil, :blah, [:arglist]]]],
-        [:lit, 13]]]
-    end
+    [:rescue,
+     [:lit, 12],
+     [:resbody,
+      [:array, [:const, :String], [:splat, [:call, nil, :blah, [:arglist]]]],
+      [:lit, 13]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         12
       rescue *blah => e
@@ -242,16 +236,15 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 12],
-       [:resbody,
-        [:splat, [:call, nil, :blah, [:arglist]], [:lasgn, :e, [:gvar, :$!]]],
-        [:lit, 13]]]
-    end
+    [:rescue,
+     [:lit, 12],
+     [:resbody,
+      [:splat, [:call, nil, :blah, [:arglist]]],
+      [:lasgn, :e, [:gvar, :$!]],
+      [:lit, 13]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         12
       rescue String, *blah => e
@@ -259,19 +252,17 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 12],
-       [:resbody,
-        [:array,
-         [:const, :String],
-         [:splat, [:call, nil, :blah, [:arglist]]],
-         [:lasgn, :e, [:gvar, :$!]]],
-        [:lit, 13]]]
-    end
+    [:rescue,
+     [:lit, 12],
+     [:resbody,
+      [:array,
+       [:const, :String],
+       [:splat, [:call, nil, :blah, [:arglist]]],
+       [:lasgn, :e, [:gvar, :$!]]],
+      [:lit, 13]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         12
       rescue String
@@ -279,14 +270,12 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 12],
-       [:resbody, [:array, [:const, :String]], [:return, [:nil]]]]
-    end
+    [:rescue,
+     [:lit, 12],
+     [:resbody, [:array, [:const, :String]], [:return, [:nil]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue
@@ -298,16 +287,16 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
+    [:rescue,
+     [:lit, 1],
+     [:resbody,
+      [:array, [:const, :StandardError]],
       [:rescue,
-       [:lit, 1],
-       [:resbody,
-        [:array],
-        [:rescue, [:lit, 2], [:resbody, [:array], [:return, [:lit, 3]]]]]]
-    end
+       [:lit, 2],
+       [:resbody, [:array, [:const, :StandardError]], [:return, [:lit, 3]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue
@@ -318,18 +307,15 @@ describe "A Rescue node" do
       end
     ruby
 
-    parse do
-      [:rescue,
-       [:lit, 1],
-       [:resbody,
-        [:array],
-        [:block,
-         [:defn, :x, [:args], [:scope, [:block, [:return, [:lit, 2]]]]],
-         [:call, nil, :x, [:arglist]]]]]
-    end
+    [:rescue,
+     [:lit, 1],
+     [:resbody,
+      [:array, [:const, :StandardError]],
+      [[:defn, :x, [:args], [:scope, [:block, [:return, [:lit, 2]]]]],
+       [:call, nil, :x, [:arglist]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         while 1
           2
@@ -340,10 +326,12 @@ describe "A Rescue node" do
       end
     ruby
 
-    # TODO
+  [:rescue,
+   [:while, [:lit, 1], [:block, [:lit, 2], [:break, [:lit, :brk]]], true],
+   [:resbody, [:array, [:const, :StandardError]], [:lit, 3]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       begin
         1
       rescue
@@ -354,6 +342,10 @@ describe "A Rescue node" do
       end
     ruby
 
-    # TODO
+    [:rescue,
+     [:lit, 1],
+     [:resbody,
+      [:array, [:const, :StandardError]],
+      [:while, [:lit, 2], [:block, [:lit, 3], [:break, [:lit, :brk]]], true]]]
   end
 end
