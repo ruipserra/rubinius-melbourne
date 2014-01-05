@@ -1,121 +1,113 @@
 describe "An Iter node" do
-  relates "m { }" do
-    parse do
-      [:iter, [:call, nil, :m, [:arglist]], nil]
-    end
+  parse "m { }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:nil]]]]
   end
 
-  relates "m do end" do
-    parse do
-      [:iter, [:call, nil, :m, [:arglist]], nil]
-    end
+  parse "m do end" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:nil]]]]
   end
 
-  relates "m { x }" do
-    parse do
+  parse "m { x }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:call, nil, :x, [:arglist]]]]]
+  end
+
+  parse "m { || x }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:call, nil, :x, [:arglist]]]]]
+  end
+
+  parse "m { |a| a + x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:call, nil, :x, [:arglist]]]
-    end
+       [:args, :a],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates "m { || x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       0,
-       [:call, nil, :x, [:arglist]]]
-    end
+  parse "m { |*| x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args, :*], [:call, nil, :x, [:arglist]]]]]
   end
 
-  relates "m { |a| a + x }" do
-    parse do
+  parse "m { |*c| x; c }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:lasgn, :a],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
+       [:args, :"*c"],
+       [:block, [:call, nil, :x, [:arglist]], [:lvar, :c]]]]]
   end
 
-  relates "m { |*| x }" do
-    parse do
+  parse "m { |a, | a + x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:splat]]],
-       [:call, nil, :x, [:arglist]]]
-    end
+       [:args, :a],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates "m { |*c| x; c }" do
-    parse do
+  parse "m { |a, *| a + x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:splat, [:lasgn, :c]]]],
-       [:block, [:call, nil, :x, [:arglist]], [:lvar, :c]]]
-    end
+       [:args, :a, :*],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates "m { |a, | a + x }" do
-    parse do
+  parse "m { |a, *c| a + x; c }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a]]],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
-  end
-
-  relates "m { |a, *| a + x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:splat]]],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
-  end
-
-  relates "m { |a, *c| a + x; c }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:splat, [:lasgn, :c]]]],
+       [:args, :a, :"*c"],
        [:block,
         [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]],
-        [:lvar, :c]]]
-    end
+        [:lvar, :c]]]]]
   end
 
-  relates "m { |a, b| a + x; b }" do
-    parse do
+  parse "m { |a, b| a + x; b }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:lasgn, :b]]],
+       [:args, :a, :b],
        [:block,
         [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]],
-        [:lvar, :b]]]
-    end
+        [:lvar, :b]]]]]
   end
 
-  relates "m { |a, b, | a + x; b }" do
-    parse do
+  parse "m { |a, b, | a + x; b }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:lasgn, :b]]],
+       [:args, :a, :b],
        [:block,
         [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]],
-        [:lvar, :b]]]
-    end
+        [:lvar, :b]]]]]
   end
 
-  relates "m { |a, b, *| a + x; b }" do
-    parse do
+  parse "m { |a, b, *| a + x; b }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:splat]]],
+       [:args, :a, :b, :*],
        [:block,
         [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]],
-        [:lvar, :b]]]
-    end
+        [:lvar, :b]]]]]
   end
 
   masgn_rest_arg_block = lambda do |g|
@@ -133,144 +125,147 @@ describe "An Iter node" do
     end
   end
 
-  relates "m { |a, b, *c| a + x; b; c }" do
-    parse do
+  parse "m { |a, b, *c| a + x; b; c }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:splat, [:lasgn, :c]]]],
+       [:args, :a, :b, :"*c"],
        [:block,
         [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]],
         [:lvar, :b],
-        [:lvar, :c]]]
-    end
+        [:lvar, :c]]]]]
   end
 
-  relates "m do |a, b, *c| a + x; b; c end" do
-    parse do
+  parse "m do |a, b, *c| a + x; b; c end" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:splat, [:lasgn, :c]]]],
+       [:args, :a, :b, :"*c"],
        [:block,
         [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]],
         [:lvar, :b],
-        [:lvar, :c]]]
-    end
+        [:lvar, :c]]]]]
   end
 
-  relates "m { n = 1; n }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:block, [:lasgn, :n, [:lit, 1]], [:lvar, :n]]]
-    end
+  parse "m { n = 1; n }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:block, [:lasgn, :n, [:lit, 1]], [:lvar, :n]]]]]
   end
 
-  relates "m { n = 1; m { n } }" do
-    parse do
+  parse "m { n = 1; m { n } }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
+       [:args],
        [:block,
         [:lasgn, :n, [:lit, 1]],
-        [:iter, [:call, nil, :m, [:arglist]], nil, [:lvar, :n]]]]
-    end
+        [:call, nil, :m, [:arglist, [:iter, [:args], [:lvar, :n]]]]]]]]
   end
 
-  relates "n = 1; m { n = 2 }; n" do
-    parse do
-      [:block,
-        [:lasgn, :n, [:lit, 1]],
-        [:iter, [:call, nil, :m, [:arglist]], nil, [:lasgn, :n, [:lit, 2]]],
-        [:lvar, :n]]
-    end
+  parse "n = 1; m { n = 2 }; n" do
+    [:block,
+     [:lasgn, :n, [:lit, 1]],
+     [:call, nil, :m, [:arglist, [:iter, [:args], [:lasgn, :n, [:lit, 2]]]]],
+     [:lvar, :n]]
   end
 
-  relates "m(a) { |b| a + x }" do
-    parse do
+  parse "m(a) { |b| a + x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:call, nil, :a, [:arglist]],
       [:iter,
-       [:call, nil, :m, [:arglist, [:call, nil, :a, [:arglist]]]],
-       [:lasgn, :b],
+       [:args, :b],
        [:call,
         [:call, nil, :a, [:arglist]],
         :+,
-        [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
+        [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       m { |a|
         a + x
       }
     ruby
 
-    parse do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:lasgn, :a],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
+       [:args, :a],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       m do |a|
         a + x
       end
     ruby
 
-    parse do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       [:lasgn, :a],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
+       [:args, :a],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates "obj.m { |a| a + x }" do
-    parse do
+  parse "obj.m { |a| a + x }" do
+    [:call,
+     [:call, nil, :obj, [:arglist]],
+     :m,
+     [:arglist,
       [:iter,
-       [:call, [:call, nil, :obj, [:arglist]], :m, [:arglist]],
-       [:lasgn, :a],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
+       [:args, :a],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates "obj.m(x) { |a| a + x }" do
-    parse do
+  parse "obj.m(x) { |a| a + x }" do
+    [:call,
+     [:call, nil, :obj, [:arglist]],
+     :m,
+     [:arglist,
+      [:call, nil, :x, [:arglist]],
       [:iter,
-       [:call,
-        [:call, nil, :obj, [:arglist]],
-        :m,
-        [:arglist, [:call, nil, :x, [:arglist]]]],
-       [:lasgn, :a],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
+       [:args, :a],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates "obj.m(a) { |a| a + x }" do
-    parse do
+  parse "obj.m(a) { |a| a + x }" do
+    [:call,
+     [:call, nil, :obj, [:arglist]],
+     :m,
+     [:arglist,
+      [:call, nil, :a, [:arglist]],
       [:iter,
-       [:call,
-        [:call, nil, :obj, [:arglist]],
-        :m,
-        [:arglist, [:call, nil, :a, [:arglist]]]],
-       [:lasgn, :a],
-       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]
-    end
+       [:args, :a],
+       [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]
   end
 
-  relates "a = 1; m { |a| a + x }" do
-    parse do
-      [:block,
-       [:lasgn, :a, [:lit, 1]],
+  parse "a = 1; m { |a| a + x }" do
+    [:block,
+     [:lasgn, :a, [:lit, 1]],
+     [:call,
+      nil,
+      :m,
+      [:arglist,
        [:iter,
-        [:call, nil, :m, [:arglist]],
-        [:lasgn, :a],
-        [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]
-    end
+        [:args, :a],
+        [:call, [:lvar, :a], :+, [:arglist, [:call, nil, :x, [:arglist]]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       x = nil
       m do |a|
         begin
@@ -283,331 +278,262 @@ describe "An Iter node" do
       end
     ruby
 
-    parse do
-      [:block,
-       [:lasgn, :x, [:nil]],
+    [:block,
+     [:lasgn, :x, [:nil]],
+     [:call,
+      nil,
+      :m,
+      [:arglist,
        [:iter,
-        [:call, nil, :m, [:arglist]],
-        [:lasgn, :a],
+        [:args, :a],
         [:ensure,
          [:rescue,
           [:lvar, :x],
           [:resbody,
            [:array, [:const, :Exception], [:lasgn, :x, [:gvar, :$!]]],
-           [:break]]],
-         [:lasgn, :x, [:lvar, :a]]]]]
-    end
+           [:break, [:nil]]]],
+         [:lasgn, :x, [:lvar, :a]]]]]]]
   end
 
-  relates "m { next }" do
-    parse do
-      [:iter, [:call, nil, :m, [:arglist]], nil, [:next]]
-    end
+  parse "m { next }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:next]]]]
   end
 
-  relates "m { next if x }" do
-    parse do
+  parse "m { next if x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:if, [:call, nil, :x, [:arglist]], [:next], nil]]]]
+  end
+
+  parse "m { next x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:next, [:call, nil, :x, [:arglist]]]]]]
+  end
+
+  parse "m { x = 1; next x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:block, [:lasgn, :x, [:lit, 1]], [:next, [:lvar, :x]]]]]]
+  end
+
+  parse "m { next [1] }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:next, [:array, [:lit, 1]]]]]]
+  end
+
+  parse "m { next *[1] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:next, [:splat, [:array, [:lit, 1]]]]]]]
+  end
+
+  parse "m { next [*[1]] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:next, [:splat, [:array, [:lit, 1]]]]]]]
+  end
+
+  parse "m { next *[1, 2] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:next, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]]
+  end
+
+  parse "m { next [*[1, 2]] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:next, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]]
+  end
+
+  parse "m { break }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:break, [:nil]]]]]
+  end
+
+  parse "m { break if x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
       [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:if, [:call, nil, :x, [:arglist]], [:next], nil]]
-    end
+       [:args],
+       [:if, [:call, nil, :x, [:arglist]], [:break, [:nil]], nil]]]]
   end
 
-  relates "m { next x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:next, [:call, nil, :x, [:arglist]]]]
-    end
+  parse "m { break x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:break, [:call, nil, :x, [:arglist]]]]]]
   end
 
-  relates "m { x = 1; next x }" do
-    parse do
-      [:iter,
-        [:call, nil, :m, [:arglist]],
-        nil,
-        [:block,
-          [:lasgn, :x, [:lit, 1]],
-          [:next, [:lvar, :x]]]]
-    end
+  parse "m { x = 1; break x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:block, [:lasgn, :x, [:lit, 1]], [:break, [:lvar, :x]]]]]]
   end
 
-  relates "m { next [1] }" do
-    parse do
-      [:iter, [:call, nil, :m, [:arglist]], nil, [:next, [:array, [:lit, 1]]]]
-    end
+  parse "m { break [1] }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:break, [:array, [:lit, 1]]]]]]
   end
 
-  relates "m { next *[1] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:next, [:svalue, [:splat, [:array, [:lit, 1]]]]]]
-    end
+  parse "m { break *[1] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:break, [:splat, [:array, [:lit, 1]]]]]]]
   end
 
-  relates "m { next [*[1]] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:next, [:array, [:splat, [:array, [:lit, 1]]]]]]
-    end
+  parse "m { break [*[1]] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:break, [:splat, [:array, [:lit, 1]]]]]]]
   end
 
-  relates "m { next *[1, 2] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:next, [:svalue, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]
-    end
+  parse "m { break *[1, 2] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:break, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]]
   end
 
-  relates "m { next [*[1, 2]] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:next, [:array, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]
-    end
+  parse "m { break [*[1, 2]] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:break, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]]
   end
 
-  relates "m { break }" do
-    parse do
-      [:iter, [:call, nil, :m, [:arglist]], nil, [:break]]
-    end
+  parse "m { return }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:return]]]]
   end
 
-  relates "m { break if x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:if, [:call, nil, :x, [:arglist]], [:break], nil]]
-    end
+  parse "m { return if x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:if, [:call, nil, :x, [:arglist]], [:return], nil]]]]
   end
 
-  relates "m { break x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:break, [:call, nil, :x, [:arglist]]]]
-    end
+  parse "m { return x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:return, [:call, nil, :x, [:arglist]]]]]]
   end
 
-  relates "m { x = 1; break x }" do
-    parse do
-      [:iter,
-        [:call, nil, :m, [:arglist]],
-        nil,
-        [:block,
-          [:lasgn, :x, [:lit, 1]],
-          [:break, [:lvar, :x]]]]
-    end
+  parse "m { x = 1; return x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:block, [:lasgn, :x, [:lit, 1]], [:return, [:lvar, :x]]]]]]
   end
 
-  relates "m { break [1] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:break, [:array, [:lit, 1]]]]
-    end
+  parse "m { return [1] }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:return, [:array, [:lit, 1]]]]]]
   end
 
-  relates "m { break *[1] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:break, [:svalue, [:splat, [:array, [:lit, 1]]]]]]
-    end
+  parse "m { return *[1] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:return, [:splat, [:array, [:lit, 1]]]]]]]
   end
 
-  relates "m { break [*[1]] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:break, [:array, [:splat, [:array, [:lit, 1]]]]]]
-    end
+  parse "m { return [*[1]] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:iter, [:args], [:return, [:splat, [:array, [:lit, 1]]]]]]]
   end
 
-  relates "m { break *[1, 2] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:break, [:svalue, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]
-    end
+  parse "m { return *[1, 2] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:return, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]]
   end
 
-  relates "m { break [*[1, 2]] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:break, [:array, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]
-    end
+  parse "m { return [*[1, 2]] }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:return, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]]
   end
 
-  relates "m { return }" do
-    parse do
-      [:iter, [:call, nil, :m, [:arglist]], nil, [:return]]
-    end
+  parse "m { redo }" do
+    [:call, nil, :m, [:arglist, [:iter, [:args], [:redo]]]]
   end
 
-  relates "m { return if x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:if, [:call, nil, :x, [:arglist]], [:return], nil]]
-    end
+  parse "m { redo if x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter, [:args], [:if, [:call, nil, :x, [:arglist]], [:redo], nil]]]]
   end
 
-  relates "m { return x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:return, [:call, nil, :x, [:arglist]]]]
-    end
+  parse "m(a) { retry }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist, [:call, nil, :a, [:arglist]], [:iter, [:args], [:retry]]]]
   end
 
-  relates "m { x = 1; return x }" do
-    parse do
-      [:iter,
-        [:call, nil, :m, [:arglist]],
-        nil,
-        [:block,
-          [:lasgn, :x, [:lit, 1]],
-          [:return, [:lvar, :x]]]]
-    end
+  parse "m(a) { retry if x }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:call, nil, :a, [:arglist]],
+      [:iter, [:args], [:if, [:call, nil, :x, [:arglist]], [:retry], nil]]]]
   end
 
-  relates "m { return [1] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:return, [:array, [:lit, 1]]]]
-    end
+  parse "break" do
+    [:break, [:nil]]
   end
 
-  relates "m { return *[1] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:return, [:svalue, [:splat, [:array, [:lit, 1]]]]]]
-    end
+  parse "redo" do
+    [:redo]
   end
 
-  relates "m { return [*[1]] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:return, [:array, [:splat, [:array, [:lit, 1]]]]]]
-    end
+  parse "retry" do
+    [:retry]
   end
 
-  relates "m { return *[1, 2] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:return, [:svalue, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]
-    end
+  parse "next" do
+    [:next]
   end
 
-  relates "m { return [*[1, 2]] }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:return, [:array, [:splat, [:array, [:lit, 1], [:lit, 2]]]]]]
-    end
-  end
-
-  relates "m { redo }" do
-    parse do
-      [:iter, [:call, nil, :m, [:arglist]], nil, [:redo]]
-    end
-  end
-
-  relates "m { redo if x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist]],
-       nil,
-       [:if, [:call, nil, :x, [:arglist]], [:redo], nil]]
-    end
-  end
-
-  relates "m(a) { retry }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist, [:call, nil, :a, [:arglist]]]],
-       nil,
-       [:retry]]
-    end
-
-    # TODO
-  end
-
-  relates "m(a) { retry if x }" do
-    parse do
-      [:iter,
-       [:call, nil, :m, [:arglist, [:call, nil, :a, [:arglist]]]],
-       nil,
-       [:if, [:call, nil, :x, [:arglist]], [:retry], nil]]
-    end
-
-    # TODO
-  end
-
-  relates "break" do
-    parse do
-      [:break]
-    end
-  end
-
-  relates "redo" do
-    parse do
-      [:redo]
-    end
-  end
-
-  relates "retry" do
-    parse do
-      [:retry]
-    end
-  end
-
-  relates "next" do
-    parse do
-      [:next]
-    end
-  end
-
-  relates <<-ruby do
+  parse <<-ruby do
       def x(a)
         bar { super }
       end
     ruby
 
-    parse do
-      [:defn,
-       :x,
-       [:args, :a],
-       [:scope, [:block, [:iter, [:call, nil, :bar, [:arglist]], nil, [:zsuper]]]]]
-    end
+    [:defn,
+     :x,
+     [:args, :a],
+     [:scope,
+      [:block, [:call, nil, :bar, [:arglist, [:iter, [:args], [:zsuper]]]]]]]
   end
 end
