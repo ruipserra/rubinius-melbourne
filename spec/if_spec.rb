@@ -1,5 +1,5 @@
 describe "An If node" do
-  relates <<-ruby do
+  parse <<-ruby do
       if true then
         10
       else
@@ -7,125 +7,95 @@ describe "An If node" do
       end
     ruby
 
-    parse do
-      [:if, [:true], [:lit, 10], [:lit, 12]]
-    end
+    [:if, [:true], [:lit, 10], [:lit, 12]]
   end
 
-  relates "if b then a end" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
-    end
+  parse "if b then a end" do
+    [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       if (x = 5
       (x + 1)) then
         nil
       end
     ruby
 
-    parse do
-      [:if,
-       [:block,
-        [:lasgn, :x, [:lit, 5]],
-        [:call, [:lvar, :x], :+, [:arglist, [:lit, 1]]]],
-       [:nil],
-       nil]
-    end
+    [:if,
+     [:block,
+      [:lasgn, :x, [:lit, 5]],
+      [:call, [:lvar, :x], :+, [:arglist, [:lit, 1]]]],
+     [:nil],
+     nil]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       if x = obj.x then
         x.do_it
       end
     ruby
 
-    parse do
-      [:if,
-       [:lasgn, :x, [:call, [:call, nil, :obj, [:arglist]], :x, [:arglist]]],
-       [:call, [:lvar, :x], :do_it, [:arglist]],
-       nil]
-    end
+    [:if,
+     [:lasgn, :x, [:call, [:call, nil, :obj, [:arglist]], :x, [:arglist]]],
+     [:call, [:lvar, :x], :do_it, [:arglist]],
+     nil]
   end
 
-  relates "return if false unless true" do
-    parse do
-      [:if, [:true], nil, [:if, [:false], [:return], nil]]
-    end
+  parse "return if false unless true" do
+    [:if, [:true], [:nil], [:if, [:false], [:return], nil]]
   end
 
-  relates "a if not b" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], nil, [:call, nil, :a, [:arglist]]]
-    end
+  parse "a if not b" do
+    [:if,
+     [:call, [:call, nil, :b, [:arglist]], :!, [:arglist]],
+     [:call, nil, :a, [:arglist]],
+     nil]
   end
 
-  relates "a if b" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
-    end
+  parse "a if b" do
+    [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
   end
 
-  relates "if not b then a end" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], nil, [:call, nil, :a, [:arglist]]]
-    end
+  parse "if not b then a end" do
+    [:if,
+     [:call, [:call, nil, :b, [:arglist]], :!, [:arglist]],
+     [:call, nil, :a, [:arglist]],
+     nil]
   end
 
-  relates "if b then a end" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
-    end
+  parse "if b then a end" do
+    [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
   end
 
   nil_condition_sexp = [:if, [:nil], [:call, nil, :a, [:arglist]], nil]
 
-  relates "a if ()" do
-    parse do
-      nil_condition_sexp
-    end
+  parse "a if ()" do
+    nil_condition_sexp
   end
 
-  relates "if () then a end" do
-    parse do
-      nil_condition_sexp
-    end
+  parse "if () then a end" do
+    nil_condition_sexp
   end
 
-  relates "a unless not ()" do
-    parse do
-      nil_condition_sexp
-    end
+  parse "a unless not b" do
+    [:if,
+     [:call, [:call, nil, :b, [:arglist]], :!, [:arglist]],
+     [:nil],
+     [:call, nil, :a, [:arglist]]]
   end
 
-  relates "unless not () then a end" do
-    parse do
-      nil_condition_sexp
-    end
+  parse "a unless b" do
+    [:if, [:call, nil, :b, [:arglist]], [:nil], [:call, nil, :a, [:arglist]]]
   end
 
-  relates "a unless not b" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
-    end
+  parse "unless not b then a end" do
+    [:if,
+     [:call, [:call, nil, :b, [:arglist]], :!, [:arglist]],
+     [:nil],
+     [:call, nil, :a, [:arglist]]]
   end
 
-  relates "a unless b" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], nil, [:call, nil, :a, [:arglist]]]
-    end
-  end
-
-  relates "unless not b then a end" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], [:call, nil, :a, [:arglist]], nil]
-    end
-  end
-
-  relates "unless b then a end" do
-    parse do
-      [:if, [:call, nil, :b, [:arglist]], nil, [:call, nil, :a, [:arglist]]]
-    end
+  parse "unless b then a end" do
+    [:if, [:call, nil, :b, [:arglist]], [:nil], [:call, nil, :a, [:arglist]]]
   end
 end
