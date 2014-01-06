@@ -1,117 +1,119 @@
 describe "A Defined node" do
-  relates "defined? $x" do
-    parse do
-      [:defined, [:gvar, :$x]]
-    end
+  parse "defined? $x" do
+    [:defined, [:gvar, :$x]]
   end
 
-  relates "defined? a" do
-    # TODO
+  parse "defined? a" do
+    [:defined, [:call, nil, :a, [:arglist]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = 1
       defined? a
     ruby
+
+    [:block, [:lasgn, :a, [:lit, 1]], [:defined, [:lvar, :a]]]
   end
 
-  relates "defined? x = 1" do
-    # TODO
+  parse "defined? x = 1" do
+    [:defined, [:lasgn, :x, [:lit, 1]]]
   end
 
-  relates "defined? x += 1" do
-    # TODO
+  parse "defined? x += 1" do
+    [:defined, [:lasgn, :x, [:call, [:lvar, :x], :+, [:arglist, [:lit, 1]]]]]
   end
 
-  relates "defined? x ||= 1" do
-    # TODO
+  parse "defined? x ||= 1" do
+    [:defined, [:op_asgn_or, [:lvar, :x], [:lasgn, :x, [:lit, 1]]]]
   end
 
-  relates "defined? x &&= 1" do
-    # TODO
+  parse "defined? x &&= 1" do
+    [:defined, [:op_asgn_and, [:lvar, :x], [:lasgn, :x, [:lit, 1]]]]
   end
 
-  relates "defined? X" do
-    # TODO
+  parse "defined? X" do
+    [:defined, [:const, :X]]
   end
 
-  relates "defined? ::X" do
-    # TODO
+  parse "defined? ::X" do
+    [:defined, [:colon3, :X]]
   end
 
-  relates "defined? X::Y" do
-    # TODO
+  parse "defined? X::Y" do
+    [:defined, [:colon2, [:const, :X], :Y]]
   end
 
-  relates "defined? X::Y::Z" do
-    # TODO
+  parse "defined? X::Y::Z" do
+    [:defined, [:colon2, [:colon2, [:const, :X], :Y], :Z]]
   end
 
-  relates "defined? self::A" do
-    # TODO
+  parse "defined? self::A" do
+    [:defined, [:colon2, [:self], :A]]
   end
 
-  relates "defined? self" do
-    # TODO
+  parse "defined? self" do
+    [:defined, [:self]]
   end
 
-  relates "defined? true" do
-    # TODO
+  parse "defined? true" do
+    [:defined, [:true]]
   end
 
-  relates "defined? false" do
-    # TODO
+  parse "defined? false" do
+    [:defined, [:false]]
   end
 
-  relates "defined? nil" do
-    # TODO
+  parse "defined? nil" do
+    [:defined, [:nil]]
   end
 
-  relates "defined? @var" do
-    # TODO
+  parse "defined? @var" do
+    [:defined, [:ivar, :@var]]
   end
 
-  relates "defined? @@var" do
-    # TODO
+  parse "defined? @@var" do
+    [:defined, [:cvar, :@@var]]
   end
 
-  relates "defined? :a" do
-    # TODO
+  parse "defined? :a" do
+    [:defined, [:lit, :a]]
   end
 
-  relates "defined? 'a'" do
-    # TODO
+  parse "defined? 'a'" do
+    [:defined, [:str, "a"]]
   end
 
-  relates "defined? 0" do
-    # TODO
+  parse "defined? 0" do
+    [:defined, [:lit, 0]]
   end
 
-  relates "defined? yield" do
-    # TODO
+  parse "defined? yield" do
+    [:defined, [:yield]]
   end
 
-  relates "defined? A.m" do
-    # TODO
+  parse "defined? A.m" do
+    [:defined, [:call, [:const, :A], :m, [:arglist]]]
   end
 
-  relates "defined? ::A.m" do
-    # TODO
+  parse "defined? ::A.m" do
+    [:defined, [:call, [:colon3, :A], :m, [:arglist]]]
   end
 
-  relates "defined? A::B.m" do
-    # TODO
+  parse "defined? A::B.m" do
+    [:defined, [:call, [:colon2, [:const, :A], :B], :m, [:arglist]]]
   end
 
-  relates "defined? a.b" do
-    # TODO
+  parse "defined? a.b" do
+    [:defined, [:call, [:call, nil, :a, [:arglist]], :b, [:arglist]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = 1
       defined? a.to_s
     ruby
 
-    # TODO
+    [:block,
+     [:lasgn, :a, [:lit, 1]],
+     [:defined, [:call, [:lvar, :a], :to_s, [:arglist]]]]
   end
 end
