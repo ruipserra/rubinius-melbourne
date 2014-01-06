@@ -1,28 +1,20 @@
 describe "A Regex node" do
-  relates "str.split(//i)" do
-    parse do
-      [:call,
-        [:call, nil, :str, [:arglist]],
-        :split,
-        [:arglist, [:regex, "", 1]]]
-    end
+  parse "str.split(//i)" do
+    [:call,
+      [:call, nil, :str, [:arglist]],
+      :split,
+      [:arglist, [:regex, "", 1]]]
   end
 
-  relates "/x/n" do
-    parse do
-      [:regex, "x", 16]
-    end
+  parse "/x/n" do
+    [:regex, "x", 512]
   end
 
-  relates "/x/o" do
-    parse do
-      [:regex, "x", 0]
-    end
+  parse "/x/o" do
+    [:regex, "x", 0]
   end
 
-  relates "/x/" do
-    parse do
-      [:regex, "x", 0]
-    end
+  parse "/x/" do
+    [:regex, "x", 0]
   end
 end
