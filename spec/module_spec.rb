@@ -1,47 +1,43 @@
 describe "A Module node" do
-  relates <<-ruby do
+  parse <<-ruby do
       module X
         def y
         end
       end
     ruby
 
-    parse do
-      [:module, :X, [:scope, [:defn, :y, [:args], [:scope, [:block, [:nil]]]]]]
-    end
+    [:module,
+    :X,
+    [:scope, [:block, [:defn, :y, [:args], [:scope, [:block, [:nil]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       module ::Y
         c
       end
     ruby
 
-    parse do
-      [:module, [:colon3, :Y], [:scope, [:call, nil, :c, [:arglist]]]]
-    end
+    [:module, [:colon3, :Y], [:scope, [:block, [:call, nil, :c, [:arglist]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       module X::Y
         c
       end
     ruby
 
-    parse do
-      [:module, [:colon2, [:const, :X], :Y], [:scope, [:call, nil, :c, [:arglist]]]]
-    end
+    [:module,
+     [:colon2, [:const, :X], :Y],
+     [:scope, [:block, [:call, nil, :c, [:arglist]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       "prevent the above from infecting rdoc"
 
       module Graffle
       end
     ruby
 
-    parse do
-      [:module, :Graffle, [:scope]]
-    end
+    [:module, :Graffle, [:scope]]
   end
 end
