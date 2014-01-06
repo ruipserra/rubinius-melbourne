@@ -1,85 +1,63 @@
 describe "An Lasgn node" do
-  relates "a = 1" do
-    parse do
-      [:lasgn, :a, [:lit, 1]]
-    end
+  parse "a = 1" do
+    [:lasgn, :a, [:lit, 1]]
   end
 
-  relates "a = b, c, *d" do
-    parse do
-      [:lasgn,
-         :a,
-         [:svalue,
-          [:array,
-           [:call, nil, :b, [:arglist]],
-           [:call, nil, :c, [:arglist]],
-           [:splat, [:call, nil, :d, [:arglist]]]]]]
-    end
+  parse "a = b, c, *d" do
+    [:lasgn,
+     :a,
+     [:argscat,
+      [:array, [:call, nil, :b, [:arglist]], [:call, nil, :c, [:arglist]]],
+      [:call, nil, :d, [:arglist]]]]
   end
 
-  relates "a = [b, *c]" do
-    parse do
-      [:lasgn,
-         :a,
-         [:array,
-          [:call, nil, :b, [:arglist]],
-          [:splat, [:call, nil, :c, [:arglist]]]]]
-    end
+  parse "a = [b, *c]" do
+    [:lasgn,
+     :a,
+     [:argscat,
+      [:array, [:call, nil, :b, [:arglist]]],
+      [:call, nil, :c, [:arglist]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       x = (y = 1
            (y + 2))
     ruby
 
-    parse do
-      [:lasgn,
-         :x,
-         [:block,
-          [:lasgn, :y, [:lit, 1]],
-          [:call, [:lvar, :y], :+, [:arglist, [:lit, 2]]]]]
-    end
+    [:lasgn,
+       :x,
+       [:block,
+        [:lasgn, :y, [:lit, 1]],
+        [:call, [:lvar, :y], :+, [:arglist, [:lit, 2]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = []
       a [42]
     ruby
 
-    parse do
-      [:block,
-       [:lasgn, :a, [:array]],
-       [:call, [:lvar, :a], :[], [:arglist, [:lit, 42]]]]
-    end
-
-    # call index space
+    [:block,
+     [:lasgn, :a, [:array]],
+     [:call, [:lvar, :a], :[], [:arglist, [:lit, 42]]]]
   end
 
-  relates 'var = ["foo", "bar"]' do
-    parse do
-      [:lasgn, :var, [:array, [:str, "foo"], [:str, "bar"]]]
-    end
+  parse 'var = ["foo", "bar"]' do
+    [:lasgn, :var, [:array, [:str, "foo"], [:str, "bar"]]]
   end
 
-  relates "c = (2 + 3)" do
-    parse do
-      [:lasgn, :c, [:call, [:lit, 2], :+, [:arglist, [:lit, 3]]]]
-    end
+  parse "c = (2 + 3)" do
+    [:lasgn, :c, [:call, [:lit, 2], :+, [:arglist, [:lit, 3]]]]
   end
 
-  relates "a = *[1]" do
-    parse do
-      [:lasgn, :a, [:svalue, [:splat, [:array, [:lit, 1]]]]]
-    end
+  parse "a = *[1]" do
+    [:lasgn, :a, [:splat, [:array, [:lit, 1]]]]
   end
 
-  relates "a = *b" do
-    parse do
-      [:lasgn, :a, [:svalue, [:splat, [:call, nil, :b, [:arglist]]]]]
-    end
+  parse "a = *b" do
+    [:lasgn, :a, [:splat, [:call, nil, :b, [:arglist]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = if c
             begin
               b
@@ -90,169 +68,145 @@ describe "An Lasgn node" do
       a
     ruby
 
-    parse do
-      [:block,
-       [:lasgn,
-        :a,
-        [:if,
-         [:call, nil, :c, [:arglist]],
-         [:rescue, [:call, nil, :b, [:arglist]], [:resbody, [:array], [:nil]]],
-         nil]],
-       [:lvar, :a]]
-    end
+    [:block,
+     [:lasgn,
+      :a,
+      [:if,
+       [:call, nil, :c, [:arglist]],
+       [:rescue,
+        [:call, nil, :b, [:arglist]],
+        [:resbody, [:array, [:const, :StandardError]], [:nil]]],
+       nil]],
+     [:lvar, :a]]
   end
 
-  relates "x = [*[1]]" do
-    parse do
-      [:lasgn, :x, [:array, [:splat, [:array, [:lit, 1]]]]]
-    end
+  parse "x = [*[1]]" do
+    [:lasgn, :x, [:splat, [:array, [:lit, 1]]]]
   end
 
-  relates "a = []" do
-    parse do
-      [:lasgn, :a, [:array]]
-    end
+  parse "a = []" do
+    [:lasgn, :a, [:array]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = 12
       a
     ruby
 
-    parse do
-      [:block, [:lasgn, :a, [:lit, 12]], [:lvar, :a]]
-    end
+    [:block, [:lasgn, :a, [:lit, 12]], [:lvar, :a]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       name
       name = 3
       name
     ruby
 
-    parse do
+    [:block,
+     [:call, nil, :name, [:arglist]],
+     [:lasgn, :name, [:lit, 3]],
+     [:lvar, :name]]
+  end
+
+  parse "a=12; b=13; true" do
+    [:block, [:lasgn, :a, [:lit, 12]], [:lasgn, :b, [:lit, 13]], [:true]]
+  end
+
+  parse <<-ruby do
+      def f
+        a = 1
+      end
+    ruby
+
+    [:defn, :f, [:args], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]
+  end
+
+  parse <<-ruby do
+      def f(a)
+        a = 1
+      end
+    ruby
+
+    [:defn, :f, [:args, :a], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]
+  end
+
+  parse <<-ruby do
+      def f
+        b { a = 1 }
+      end
+    ruby
+
+    [:defn,
+     :f,
+     [:args],
+     [:scope,
       [:block,
-       [:call, nil, :name, [:arglist]],
-       [:lasgn, :name, [:lit, 3]],
-       [:lvar, :name]]
-    end
+       [:call, nil, :b, [:arglist, [:iter, [:args], [:lasgn, :a, [:lit, 1]]]]]]]]
   end
 
-  relates "a=12; b=13; true" do
-    parse do
-      [:block, [:lasgn, :a, [:lit, 12]], [:lasgn, :b, [:lit, 13]], [:true]]
-    end
-  end
-
-  relates <<-ruby do
-      def f
-        a = 1
-      end
-    ruby
-
-    parse do
-      [:defn, :f, [:args], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]
-    end
-  end
-
-  relates <<-ruby do
-      def f(a)
-        a = 1
-      end
-    ruby
-
-    parse do
-      [:defn, :f, [:args, :a], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]
-    end
-  end
-
-  relates <<-ruby do
-      def f
-        b { a = 1 }
-      end
-    ruby
-
-    parse do
-      [:defn,
-       :f,
-       [:args],
-       [:scope,
-        [:block,
-         [:iter, [:call, nil, :b, [:arglist]], nil, [:lasgn, :a, [:lit, 1]]]]]]
-    end
-  end
-
-  relates <<-ruby do
+  parse <<-ruby do
       def f(a)
         b { a = 2 }
       end
     ruby
 
-    parse do
-      [:defn,
-       :f,
-       [:args, :a],
-       [:scope,
-        [:block,
-         [:iter, [:call, nil, :b, [:arglist]], nil, [:lasgn, :a, [:lit, 2]]]]]]
-    end
+    [:defn,
+     :f,
+     [:args, :a],
+     [:scope,
+      [:block,
+       [:call, nil, :b, [:arglist, [:iter, [:args], [:lasgn, :a, [:lit, 2]]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       def f
         a = 1
         b { a = 2 }
       end
     ruby
 
-    parse do
-      [:defn,
-       :f,
-       [:args],
-       [:scope,
-        [:block,
-         [:lasgn, :a, [:lit, 1]],
-         [:iter, [:call, nil, :b, [:arglist]], nil, [:lasgn, :a, [:lit, 2]]]]]]
-    end
+    [:defn,
+     :f,
+     [:args],
+     [:scope,
+      [:block,
+       [:lasgn, :a, [:lit, 1]],
+       [:call, nil, :b, [:arglist, [:iter, [:args], [:lasgn, :a, [:lit, 2]]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       def f
         a
         b { a = 1 }
       end
     ruby
 
-    parse do
-      [:defn,
-       :f,
-       [:args],
-       [:scope,
-        [:block,
-         [:call, nil, :a, [:arglist]],
-         [:iter, [:call, nil, :b, [:arglist]], nil, [:lasgn, :a, [:lit, 1]]]]]]
-    end
+    [:defn,
+     :f,
+     [:args],
+     [:scope,
+      [:block,
+       [:call, nil, :a, [:arglist]],
+       [:call, nil, :b, [:arglist, [:iter, [:args], [:lasgn, :a, [:lit, 1]]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       def f
         b { a = 1 }
         a
       end
     ruby
 
-    parse do
-      [:defn,
-       :f,
-       [:args],
-       [:scope,
-        [:block,
-         [:iter, [:call, nil, :b, [:arglist]], nil, [:lasgn, :a, [:lit, 1]]],
-         [:call, nil, :a, [:arglist]]]]]
-    end
+    [:defn,
+     :f,
+     [:args],
+     [:scope,
+      [:block,
+       [:call, nil, :b, [:arglist, [:iter, [:args], [:lasgn, :a, [:lit, 1]]]]],
+       [:call, nil, :a, [:arglist]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       def f
         a = 1
         b { a = 2 }
@@ -260,58 +214,53 @@ describe "An Lasgn node" do
       end
     ruby
 
-    parse do
-      [:defn,
-       :f,
-       [:args],
-       [:scope,
-        [:block,
-         [:lasgn, :a, [:lit, 1]],
-         [:iter, [:call, nil, :b, [:arglist]], nil, [:lasgn, :a, [:lit, 2]]],
-         [:lvar, :a]]]]
-    end
+    [:defn,
+     :f,
+     [:args],
+     [:scope,
+      [:block,
+       [:lasgn, :a, [:lit, 1]],
+       [:call, nil, :b, [:arglist, [:iter, [:args], [:lasgn, :a, [:lit, 2]]]]],
+       [:lvar, :a]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       class F
         a = 1
       end
     ruby
 
-    parse do
-      [:class, :F, nil, [:scope, [:lasgn, :a, [:lit, 1]]]]
-    end
+    [:class, :F, nil, [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = Object
       class a::F
         b = 1
       end
     ruby
 
-    parse do
-      [:block,
-       [:lasgn, :a, [:const, :Object]],
-       [:class, [:colon2, [:lvar, :a], :F], nil, [:scope, [:lasgn, :b, [:lit, 1]]]]]
-    end
+    [:block,
+     [:lasgn, :a, [:const, :Object]],
+     [:class,
+      [:colon2, [:lvar, :a], :F],
+      nil,
+      [:scope, [:block, [:lasgn, :b, [:lit, 1]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = Object
       class F < a
         b = 1
       end
     ruby
 
-    parse do
-      [:block,
-       [:lasgn, :a, [:const, :Object]],
-       [:class, :F, [:lvar, :a], [:scope, [:lasgn, :b, [:lit, 1]]]]]
-    end
+    [:block,
+     [:lasgn, :a, [:const, :Object]],
+     [:class, :F, [:lvar, :a], [:scope, [:block, [:lasgn, :b, [:lit, 1]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       class F
         a = 1
         def f
@@ -320,29 +269,25 @@ describe "An Lasgn node" do
       end
     ruby
 
-    parse do
-      [:class,
-       :F,
-       nil,
-       [:scope,
-        [:block,
-         [:lasgn, :a, [:lit, 1]],
-         [:defn, :f, [:args], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]]]]
-    end
+    [:class,
+     :F,
+     nil,
+     [:scope,
+      [:block,
+       [:lasgn, :a, [:lit, 1]],
+       [:defn, :f, [:args], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       module M
         a = 1
       end
     ruby
 
-    parse do
-      [:module, :M, [:scope, [:lasgn, :a, [:lit, 1]]]]
-    end
+    [:module, :M, [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       module M
         a = 1
         def f
@@ -351,27 +296,25 @@ describe "An Lasgn node" do
       end
     ruby
 
-    parse do
-      [:module,
-       :M,
-       [:scope,
-        [:block,
-         [:lasgn, :a, [:lit, 1]],
-         [:defn, :f, [:args], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]]]]
-    end
+    [:module,
+     :M,
+     [:scope,
+      [:block,
+       [:lasgn, :a, [:lit, 1]],
+       [:defn, :f, [:args], [:scope, [:block, [:lasgn, :a, [:lit, 1]]]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = Object
       module a::M
         b = 1
       end
     ruby
 
-    parse do
-      [:block,
-       [:lasgn, :a, [:const, :Object]],
-       [:module, [:colon2, [:lvar, :a], :M], [:scope, [:lasgn, :b, [:lit, 1]]]]]
-    end
+    [:block,
+     [:lasgn, :a, [:const, :Object]],
+     [:module,
+      [:colon2, [:lvar, :a], :M],
+      [:scope, [:block, [:lasgn, :b, [:lit, 1]]]]]]
   end
 end
