@@ -1,19 +1,13 @@
 describe "An And node" do
-  relates "(a and b)" do
-    parse do
-      [:and, [:call, nil, :a, [:arglist]], [:call, nil, :b, [:arglist]]]
-    end
+  parse "(a and b)" do
+    [:and, [:call, nil, :a, [:arglist]], [:call, nil, :b, [:arglist]]]
   end
 
-  relates "() and a" do
-    parse do
-      [:and, [:nil], [:call, nil, :a, [:arglist]]]
-    end
+  parse "() and a" do
+    [:and, [:nil], [:call, nil, :a, [:arglist]]]
   end
 
-  relates "a and ()" do
-    parse do
-      [:and, [:call, nil, :a, [:arglist]], [:nil]]
-    end
+  parse "a and ()" do
+    [:and, [:call, nil, :a, [:arglist]], [:nil]]
   end
 end

@@ -1,25 +1,17 @@
 describe "A Gvar node" do
-  relates "$x" do
-    parse do
-      [:gvar, :$x]
-    end
+  parse "$x" do
+    [:gvar, :$x]
   end
 
-  relates "$stderr" do
-    parse do
-      [:gvar, :$stderr]
-    end
+  parse "$stderr" do
+    [:gvar, :$stderr]
   end
 
-  relates "$__blah" do
-    parse do
-      [:gvar, :$__blah]
-    end
+  parse "$__blah" do
+    [:gvar, :$__blah]
   end
 
-  relates "$_" do
-    parse do
-      [:gvar, :$_]
-    end
+  parse "$_" do
+    [:gvar, :$_]
   end
 end

@@ -1,7 +1,5 @@
 describe "A True node" do
-  relates "true" do
-    parse do
-      [:true]
-    end
+  parse "true" do
+    [:true]
   end
 end

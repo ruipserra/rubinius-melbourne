@@ -1,7 +1,5 @@
 describe "A Nil node" do
-  relates "nil" do
-    parse do
-      [:nil]
-    end
+  parse "nil" do
+    [:nil]
   end
 end

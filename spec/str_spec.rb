@@ -1,48 +1,38 @@
 describe "A Str node" do
-  relates '"x"' do
-    parse do
-      [:str, "x"]
-    end
+  parse '"x"' do
+    [:str, "x"]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       "before" \
       " after"
     ruby
 
-    parse do
-      [:str, "before after"]
-    end
+    [:str, "before after"]
   end
 
-  relates '"before" " after"' do
-    parse do
-      [:str, "before after"]
-    end
+  parse '"before" " after"' do
+    [:str, "before after"]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       "file = \#{__FILE__}\n"
     ruby
 
-    parse do
-      [:dstr, "file = ", [:evstr, [:file]], [:str, "\n"]]
-    end
+    [:dstr, "file = ", [:evstr, [:file]], [:str, "\n"]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
 <<'EOM'.strip
   blah
 blah
 EOM
     ruby
 
-    parse do
-      [:call, [:str, "  blah\nblah\n"], :strip, [:arglist]]
-    end
+    [:call, [:str, "  blah\nblah\n"], :strip, [:arglist]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
 a += <<-H1 + b + <<-H2
   first
 H1
@@ -50,21 +40,19 @@ H1
 H2
     ruby
 
-    parse do
-      [:lasgn,
-       :a,
+    [:lasgn,
+     :a,
+     [:call,
+      [:lvar, :a],
+      :+,
+      [:arglist,
        [:call,
-        [:lvar, :a],
+        [:call, [:str, "  first\n"], :+, [:arglist, [:call, nil, :b, [:arglist]]]],
         :+,
-        [:arglist,
-         [:call,
-          [:call, [:str, "  first\n"], :+, [:arglist, [:call, nil, :b, [:arglist]]]],
-          :+,
-          [:arglist, [:str, "  second\n"]]]]]]
-    end
+        [:arglist, [:str, "  second\n"]]]]]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
 <<-EOM
   blah
 blah
@@ -72,26 +60,20 @@ blah
   EOM
     ruby
 
-    parse do
-      [:str, "  blah\nblah\n\n"]
-    end
+    [:str, "  blah\nblah\n\n"]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
 <<'EOM'
   blah
 blah
 EOM
     ruby
 
-    parse do
-      [:str, "  blah\nblah\n"]
-    end
+    [:str, "  blah\nblah\n"]
   end
 
-  relates "%(blah)" do
-    parse do
-      [:str, "blah"]
-    end
+  parse "%(blah)" do
+    [:str, "blah"]
   end
 end

@@ -1,7 +1,5 @@
 describe "A Valias node" do
-  relates "alias $y $x" do
-    parse do
-      [:valias, :$y, :$x]
-    end
+  parse "alias $y $x" do
+    [:valias, :$y, :$x]
   end
 end

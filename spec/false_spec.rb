@@ -1,7 +1,5 @@
 describe "A False node" do
-  relates "false" do
-    parse do
-      [:false]
-    end
+  parse "false" do
+    [:false]
   end
 end
