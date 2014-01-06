@@ -1,17 +1,15 @@
 describe "A Not node" do
-  relates "(not true)" do
-    parse do
-      [:not, [:true]]
-    end
+  parse "(not true)" do
+    [:call, [:true], :!, [:arglist]]
   end
 
-  relates <<-ruby do
+  parse <<-ruby do
       a = 1
       b = !a
     ruby
 
-    parse do
-      [:block, [:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:not, [:lvar, :a]]]]
-    end
+    [:block,
+     [:lasgn, :a, [:lit, 1]],
+     [:lasgn, :b, [:call, [:lvar, :a], :!, [:arglist]]]]
   end
 end
