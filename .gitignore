@@ -21,3 +21,4 @@ tmp
 .rbx
 Makefile
 namespace.h
+.spec_ruby_version

@@ -3,7 +3,7 @@ require "rubinius/melbourne/version"
 
 class String
   def to_ast(name="(eval)", line=1)
-    Rubinius::ToolSet.get(:runtime)::Melbourne.parse_string self, name, line
+    Rubinius::ToolSet.get(:spec)::Melbourne.parse_string self, name, line
   end
 
   def to_sexp(name="(eval)", line=1)
@@ -13,7 +13,7 @@ end
 
 class File
   def self.to_ast(name, line=1)
-    Rubinius::ToolSet.get(:runtime)::Melbourne.parse_file name, line
+    Rubinius::ToolSet.get(:spec)::Melbourne.parse_file name, line
   end
 
   def self.to_sexp(name, line=1)
