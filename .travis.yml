@@ -2,6 +2,7 @@ language: ruby
 env:
   - MELBOURNE_SPEC_VERSION=1 RUBYLIB=lib:.
   - MELBOURNE_SPEC_VERSION=1 RUBYLIB=.
+before_install: gem install rubinius-toolset
 script: bundle exec mspec spec
 rvm:
   - 2.1.0
