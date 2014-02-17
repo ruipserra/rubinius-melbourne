@@ -4,11 +4,11 @@ env:
   - MELBOURNE_SPEC_VERSION=1 RUBYLIB=.
 script: bundle exec mspec spec
 rvm:
-  - 2.0.0
+  - 2.1.0
   - rbx-2
 matrix:
   exclude:
-    - rvm: ruby-head
+    - rvm: 2.1.0
       env: MELBOURNE_SPEC_VERSION=1 RUBYLIB=lib:.
     - rvm: rbx-2
       env: MELBOURNE_SPEC_VERSION=1 RUBYLIB=.
