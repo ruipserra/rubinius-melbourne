@@ -1,10 +1,11 @@
 require 'rbconfig'
 
-# Fake out Rubinius::ToolSet for bootstrapping
+# Fake out Rubinius::ToolSets for bootstrapping
 module Rubinius
-  module ToolSet
+  module ToolSets
     def self.current
       @current ||= Module.new
+      @current.const_set :ToolSet, @current
     end
   end
 end
