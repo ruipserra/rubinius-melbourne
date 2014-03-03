@@ -1,6 +1,6 @@
 require 'rbconfig'
 
-# Fake out Rubinius::ToolSet for bootstrapping
+# Fake out Rubinius::ToolSets for bootstrapping
 module Rubinius
   module ToolSet
     def self.current
@@ -13,7 +13,7 @@ require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
 
 path = File.expand_path "../namespace.h", __FILE__
 File.open path, "wb" do |f|
-  version = Rubinius::ToolSet.current::TS::Melbourne::VERSION
+  version = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
   melbourne = "melbourne_#{version.gsub(/\./, "_")}"
   f.puts "#define MELBOURNE                 #{melbourne}"
   f.puts "#define MELBOURNE_FILE_TO_AST     #{melbourne}_file_to_ast"
