@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.version       = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
 
-  spec.add_runtime_dependency     "rubinius-toolset"
+  spec.add_runtime_dependency     "rubinius-toolset", "~> 2.2"
 
   spec.add_development_dependency "rubinius-processor", "~> 2.0"
   spec.add_development_dependency "rubinius-compiler", "~> 2.0"
