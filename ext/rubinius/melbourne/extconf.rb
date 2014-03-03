@@ -13,7 +13,7 @@ require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
 
 path = File.expand_path "../namespace.h", __FILE__
 File.open path, "wb" do |f|
-  version = Rubinius::ToolSet.current::ToolSet::Melbourne::VERSION
+  version = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
 
   if ENV["MELBOURNE_SPEC_VERSION"]
     # Alter the version to not match any possible loaded version

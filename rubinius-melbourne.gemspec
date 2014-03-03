@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.name          = "rubinius-melbourne"
   spec.require_paths = ["lib"]
-  spec.version       = Rubinius::ToolSet.current::ToolSet::Melbourne::VERSION
+  spec.version       = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
 
   spec.add_runtime_dependency     "rubinius-toolset"
 

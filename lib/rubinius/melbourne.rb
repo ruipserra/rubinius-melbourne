@@ -21,7 +21,7 @@ class File
   end
 end
 
-module Rubinius::ToolSet.current::ToolSet
+module Rubinius::ToolSets.current::ToolSet
   class Melbourne
     attr_accessor :transforms
     attr_accessor :magic_handler
