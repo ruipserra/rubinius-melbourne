@@ -1,26 +1,6 @@
 require "rubinius/melbourne/melbourne"
 require "rubinius/melbourne/version"
 
-class String
-  def to_ast(name="(eval)", line=1)
-    Rubinius::ToolSets::Spec::Melbourne.parse_string self, name, line
-  end
-
-  def to_sexp(name="(eval)", line=1)
-    to_ast(name, line).to_sexp
-  end
-end
-
-class File
-  def self.to_ast(name, line=1)
-    Rubinius::ToolSets::Spec::Melbourne.parse_file name, line
-  end
-
-  def self.to_sexp(name, line=1)
-    to_ast(name, line).to_sexp
-  end
-end
-
 module Rubinius::ToolSets.current::ToolSet
   class Melbourne
     attr_accessor :transforms
