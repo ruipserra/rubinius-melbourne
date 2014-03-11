@@ -4549,8 +4549,8 @@ parser_prepare(rb_parser_state* parser_state)
 #define IS_LABEL_SUFFIX(n) (peek_n(':',(n)) && !peek_n(':', (n)+1))
 
 #define ambiguous_operator(op, syn) ( \
-    rb_warning0("`"op"' after local variable is interpreted as binary operator"), \
-    rb_warning0("even though it seems like "syn""))
+    rb_warning0("`" op "' after local variable is interpreted as binary operator"), \
+    rb_warning0("even though it seems like " syn ""))
 #define warn_balanced(op, syn) \
     (last_state != EXPR_CLASS && last_state != EXPR_DOT && \
      last_state != EXPR_FNAME && last_state != EXPR_ENDFN && \
@@ -4561,7 +4561,7 @@ parser_prepare(rb_parser_state* parser_state)
 static int
 parser_yylex(rb_parser_state *parser_state)
 {
-  register int c;
+  int c;
   int space_seen = 0;
   int cmd_state;
   enum lex_state_e last_state;
@@ -7109,8 +7109,8 @@ parser_id2name(ID id)
 static int
 scan_oct(const char *start, size_t len, size_t *retlen)
 {
-  register const char *s = start;
-  register int retval = 0;
+  const char *s = start;
+  int retval = 0;
 
   while(len-- && *s >= '0' && *s <= '7') {
     retval <<= 3;
@@ -7124,8 +7124,8 @@ static int
 scan_hex(const char *start, size_t len, size_t *retlen)
 {
   static const char hexdigit[] = "0123456789abcdef0123456789ABCDEF";
-  register const char *s = start;
-  register int retval = 0;
+  const char *s = start;
+  int retval = 0;
   const char *tmp;
 
   while(len-- && *s && (tmp = strchr(hexdigit, *s))) {
