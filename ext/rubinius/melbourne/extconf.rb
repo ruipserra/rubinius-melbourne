@@ -2,9 +2,10 @@ require 'rbconfig'
 
 # Fake out Rubinius::ToolSets for bootstrapping
 module Rubinius
-  module ToolSet
+  module ToolSets
     def self.current
       @current ||= Module.new
+      @current.const_set :ToolSet, @current
     end
   end
 end
@@ -14,7 +15,14 @@ require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
 path = File.expand_path "../namespace.h", __FILE__
 File.open path, "wb" do |f|
   version = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
+
+  if ENV["MELBOURNE_SPEC_VERSION"]
+    # Alter the version to not match any possible loaded version
+    version = version.split(".").map { |x| x + 1 }.join(".")
+  end
+
   melbourne = "melbourne_#{version.gsub(/\./, "_")}"
+
   f.puts "#define MELBOURNE                 #{melbourne}"
   f.puts "#define MELBOURNE_FILE_TO_AST     #{melbourne}_file_to_ast"
   f.puts "#define MELBOURNE_STRING_TO_AST   #{melbourne}_string_to_ast"
@@ -101,7 +109,7 @@ unless File.exist? "Makefile" and
   dldflags = ENV["LDFLAGS"] || RbConfig::CONFIG["LDFLAGS"] || ""
   dldflags += " #{RbConfig::CONFIG["DLDFLAGS"]}"
   libpath = "-L. -L#{RbConfig::CONFIG["libdir"]}"
-  libs = RbConfig::CONFIG["LIBS"]
+  libs = "#{RbConfig::CONFIG["LIBS"]} #{RbConfig::CONFIG["LIBRUBYARG_SHARED"]}"
   install_path = Dir.pwd.sub %r[/ext/rubinius/melbourne$], "/lib/rubinius/melbourne"
 
   File.open "Makefile", "wb" do |f|
