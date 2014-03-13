@@ -20,7 +20,7 @@ File.open path, "wb" do |f|
   f.puts "#define MELBOURNE_STRING_TO_AST   #{melbourne}_string_to_ast"
 end
 
-unless File.exists? "Makefile" and
+unless File.exist? "Makefile" and
     File.mtime("Makefile") > File.mtime(__FILE__)
   cxx = ENV["CXX"] || RbConfig::CONFIG["CXX"] || "g++"
   cxxflags = "#{ENV["CXXFLAGS"] || ENV["CPPFLAGS"] ||
@@ -37,7 +37,7 @@ unless File.exists? "Makefile" and
   archincdirs = []
   incdirs.each do |x|
     dir = "#{x}/#{RbConfig::CONFIG["arch"]}"
-    archincdirs << dir if File.exists? dir
+    archincdirs << dir if File.exist? dir
   end
   incdirs.concat archincdirs
 

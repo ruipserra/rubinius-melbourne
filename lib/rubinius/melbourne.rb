@@ -74,7 +74,7 @@ module Rubinius::ToolSets.current::ToolSet
     end
 
     def parse_file
-      unless @name and File.exists? @name
+      unless @name and File.exist? @name
         raise Errno::ENOENT, @name.inspect
       end
 
