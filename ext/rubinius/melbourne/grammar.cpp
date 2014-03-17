@@ -612,10 +612,10 @@ static NODE *extract_block_vars(rb_parser_state *parser_state, NODE* node, var_t
 /* Must match up with options/kcode definitions in regexp.rb and regexp.cpp */
 #define RE_OPTION_DONT_CAPTURE_GROUP (128)
 #define RE_OPTION_CAPTURE_GROUP      (256)
-#define RE_KCODE_NONE                (1 << 9)
-#define RE_KCODE_EUC                 (2 << 9)
-#define RE_KCODE_SJIS                (3 << 9)
-#define RE_KCODE_UTF8                (4 << 9)
+#define RE_KCODE_NONE                (16)
+#define RE_KCODE_EUC                 (32)
+#define RE_KCODE_SJIS                (48)
+#define RE_KCODE_UTF8                (64)
 #define RE_OPTION_ONCE               (8192)
 
 #define NODE_STRTERM NODE_ZARRAY        /* nothing to gc */
