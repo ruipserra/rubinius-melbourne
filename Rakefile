@@ -17,7 +17,7 @@ namespace :spec do
     extension_dir do
       unless File.exist? spec_ruby_version and
              File.read(spec_ruby_version) == RUBY_DESCRIPTION
-        sh "make distclean"
+        sh "make distclean" if File.exist? "Makefile"
         File.open(spec_ruby_version, "w") { |f| f.write RUBY_DESCRIPTION }
       end
     end
