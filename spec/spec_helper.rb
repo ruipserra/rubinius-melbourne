@@ -7,3 +7,5 @@ Rubinius::ToolSets.create :spec do
   require "rubinius/compiler"
   require "rubinius/ast"
 end
+
+$VERBOSE = nil
