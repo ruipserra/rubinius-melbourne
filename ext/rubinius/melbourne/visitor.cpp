@@ -693,49 +693,63 @@ namespace MELBOURNE {
       tree = rb_funcall(ptp, rb_sOptArg, 2, line, args);
       break;
     }
+    case NODE_KW_ARG: {
+      VALUE args = rb_ary_new();
+
+      do {
+        rb_ary_push(args, process_parse_tree(parser_state, ptp, node->nd_body, locals));
+        node = node->nd_next;
+      } while(node);
+
+      tree = rb_funcall(ptp, rb_sKwArg, 2, line, args);
+      break;
+    }
     case NODE_ARGS: {
       VALUE args = Qnil;
       VALUE opts = Qnil;
       VALUE splat = Qnil;
       VALUE post = Qnil;
+      VALUE kwargs = Qnil;
+      VALUE kwrest = Qnil;
       VALUE block = Qnil;
 
       int total_args = 0;
       ID* args_ary = 0;
 
-      NODE* aux = node->nd_args;
-      NODE* post_args = aux->nd_next;
+      struct rb_args_info *ainfo = node->nd_ainfo;
+      // NODE* aux = node->nd_args;
+      // NODE* post_args = ainfo->post_init;
       NODE* masgn = 0;
       NODE* next = 0;
 
-      if(post_args && post_args->nd_next && nd_type(post_args->nd_next) == NODE_AND) {
-        if(post_args->nd_next->nd_head) {
-          if (nd_type(post_args->nd_next->nd_head) == NODE_BLOCK) {
-            masgn = post_args->nd_next->nd_head->nd_head;
-            next = post_args->nd_next->nd_head->nd_next;
-          } else {
-            masgn = post_args->nd_next->nd_head;
-            next = masgn->nd_next;
-            // -1 comes from: mlhs_head tSTAR
-            if(masgn->nd_cnt == -1) next = 0;
-          }
-        } else {
-          masgn = post_args->nd_next->nd_2nd;
-          if(masgn) {
-            next = masgn->nd_next;
-            if (nd_type(masgn) == NODE_BLOCK) {
-              masgn = masgn->nd_head;
-            }
-          }
-        }
-      }
+      // if(post_args && post_args->nd_next && nd_type(post_args->nd_next) == NODE_AND) {
+      //   if(post_args->nd_next->nd_head) {
+      //     if (nd_type(post_args->nd_next->nd_head) == NODE_BLOCK) {
+      //       masgn = post_args->nd_next->nd_head->nd_head;
+      //       next = post_args->nd_next->nd_head->nd_next;
+      //     } else {
+      //       masgn = post_args->nd_next->nd_head;
+      //       next = masgn->nd_next;
+      //       // -1 comes from: mlhs_head tSTAR
+      //       if(masgn->nd_cnt == -1) next = 0;
+      //     }
+      //   } else {
+      //     masgn = post_args->nd_next->nd_2nd;
+      //     if(masgn) {
+      //       next = masgn->nd_next;
+      //       if (nd_type(masgn) == NODE_BLOCK) {
+      //         masgn = masgn->nd_head;
+      //       }
+      //     }
+      //   }
+      // }
 
-      if(node->nd_argc > 0) {
+      if(ainfo->pre_args_num > 0) {
         total_args = (int)locals[0];
         args_ary = locals + 1;
 
         args = rb_ary_new();
-        for(int i = 0; i < node->nd_argc && i < total_args; i++) {
+        for(int i = 0; i < ainfo->pre_args_num && i < total_args; i++) {
           VALUE arg = Qnil;
 
           if(!INTERNAL_ID_P(args_ary[i])) {
@@ -755,34 +769,50 @@ namespace MELBOURNE {
         }
       }
 
-      if(node->nd_opt) {
-        opts = process_parse_tree(parser_state, ptp, node->nd_opt, locals);
+      if(ainfo->opt_args) {
+        opts = process_parse_tree(parser_state, ptp, ainfo->opt_args, locals);
       }
 
-      if(INTERNAL_ID_P(aux->nd_rest)) {
+      if(ainfo->kw_args) {
+        kwargs = process_parse_tree(parser_state, ptp, ainfo->kw_args, locals);
+      }
+
+      if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
         splat = Qtrue;
-      } else if(aux->nd_rest) {
-        if(aux->nd_rest == 1) {
+      } else if(ainfo->rest_arg) {
+        if(ainfo->rest_arg == 1) {
           // m { |a,| ... }
           splat = Qfalse;
         } else {
-          splat = ID2SYM(aux->nd_rest);
+          splat = ID2SYM(ainfo->rest_arg);
         }
       }
-      if(aux->nd_mid) block = ID2SYM(aux->nd_mid);
 
-      if(post_args && post_args->nd_pid) {
+      if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
+        kwrest = Qtrue;
+      } else if(ainfo->kw_rest_arg->nd_vid) {
+        if(ainfo->kw_rest_arg->nd_vid == 1) {
+          // m { |a,| ... }
+          kwrest = Qfalse;
+        } else {
+          kwrest = ID2SYM(ainfo->kw_rest_arg->nd_vid);
+        }
+      }
+
+      if(ainfo->block_arg) block = ID2SYM(ainfo->block_arg);
+
+      if(ainfo->post_args_num > 0) {
         total_args = (int)locals[0];
         args_ary = locals + 1;
 
         int start;
         for(start = 0; start < total_args; start++) {
-          if(args_ary[start] == post_args->nd_pid)
+          if(args_ary[start] == ainfo->first_post_arg)
             break;
         }
 
         post = rb_ary_new();
-        for(int i = 0; i < post_args->nd_argc && start + i < total_args; i++) {
+        for(int i = 0; i < ainfo->post_args_num && start + i < total_args; i++) {
           VALUE arg = Qnil;
 
           if(!INTERNAL_ID_P(args_ary[start + i])) {
@@ -801,7 +831,7 @@ namespace MELBOURNE {
         }
       }
 
-      tree = rb_funcall(ptp, rb_sArgs, 6, line, args, opts, splat, post, block);
+      tree = rb_funcall(ptp, rb_sArgs, 8, line, args, opts, splat, post, kwargs, kwrest, block);
       break;
     }
     case NODE_LVAR:

@@ -66,6 +66,7 @@ node_types = %w[
   args
   args_aux
   opt_arg
+  kw_arg
   postarg
   argscat
   argspush

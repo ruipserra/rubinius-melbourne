@@ -59,6 +59,7 @@ namespace MELBOURNE {
   ID rb_sIf;
   ID rb_sIter;
   ID rb_sIVar;
+  ID rb_sKwArg;
   ID rb_sLAsgn;
   ID rb_sLambda;
   ID rb_sLit;
@@ -171,6 +172,7 @@ namespace MELBOURNE {
     rb_sIf          = rb_intern("process_if");
     rb_sIter        = rb_intern("process_iter");
     rb_sIVar        = rb_intern("process_ivar");
+    rb_sKwArg       = rb_intern("process_kw_arg");
     rb_sLAsgn       = rb_intern("process_lasgn");
     rb_sLambda      = rb_intern("process_lambda");
     rb_sLit         = rb_intern("process_lit");
