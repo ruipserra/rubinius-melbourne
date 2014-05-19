@@ -18,7 +18,7 @@ File.open path, "wb" do |f|
 
   if ENV["MELBOURNE_SPEC_VERSION"]
     # Alter the version to not match any possible loaded version
-    version = version.split(".").map { |x| x + 1 }.join(".")
+    version = version.split(".").map { |x| Integer(x) + 1 }.join(".")
   end
 
   melbourne = "melbourne_#{version.gsub(/\./, "_")}"
