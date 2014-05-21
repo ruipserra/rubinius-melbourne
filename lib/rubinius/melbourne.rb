@@ -1,7 +1,7 @@
-require "rubinius/melbourne/melbourne"
 require "rubinius/melbourne/version"
+require "rubinius/melbourne/melbourne"
 
-module Rubinius::ToolSets.current::ToolSet
+module CodeTools
   class Melbourne
     attr_accessor :transforms
     attr_accessor :magic_handler

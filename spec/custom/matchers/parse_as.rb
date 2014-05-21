@@ -10,7 +10,7 @@ class ParseAsMatcher
   end
 
   def matches?(actual)
-    parse = Rubinius::ToolSets::Spec::Melbourne.parse_string actual
+    parse = CodeTools::Melbourne.parse_string actual
     @actual = parse.to_sexp.to_a
     @actual == @expected
   end

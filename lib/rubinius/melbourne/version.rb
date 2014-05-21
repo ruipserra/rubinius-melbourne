@@ -1,4 +1,4 @@
-module Rubinius::ToolSets.current::ToolSet
+module CodeTools
   class Melbourne
     VERSION = "2.1.0.0"
   end

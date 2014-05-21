@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-require 'rubinius/toolset'
 require './lib/rubinius/melbourne/version'
 
 Gem::Specification.new do |spec|
@@ -16,9 +15,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.name          = "rubinius-melbourne"
   spec.require_paths = ["lib"]
-  spec.version       = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
-
-  spec.add_runtime_dependency     "rubinius-toolset", "~> 2.2"
+  spec.version       = CodeTools::Melbourne::VERSION
 
   spec.add_development_dependency "rubinius-processor", "~> 2.0"
   spec.add_development_dependency "rubinius-compiler", "~> 2.0"
