@@ -8,7 +8,7 @@ File.open path, "wb" do |f|
 
   if ENV["MELBOURNE_SPEC_VERSION"]
     # Alter the version to not match any possible loaded version
-    version = version.split(".").map { |x| Integer(x) + 1 }.join(".")
+    version << ".spec"
   end
 
   melbourne = "melbourne_#{version.gsub(/\./, "_")}"
@@ -66,7 +66,7 @@ unless File.exist? "Makefile" and
       if RbConfig::CONFIG['CC'] == 'cc' and `cc -flags 2>&1` =~ /Sun/
         # SUN CHAIN
         cxxflags << " -DCC_SUNWspro"
-        cxxflags.gsub! /-fPIC/, ""
+        cxxflags.gsub!(/-fPIC/, "")
         cxxflags << " -KPIC"
         ldsharedxx = "#{cxx} -G -KPIC -lCstd"
       else
