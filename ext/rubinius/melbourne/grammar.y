@@ -380,7 +380,8 @@ static int scan_hex(const char *start, size_t len, size_t *retlen);
 #define ENC_SINGLE(cr)        ((cr)==ENC_CODERANGE_7BIT)
 #define TOK_INTERN(mb)        parser_intern3(tok(), toklen(), parser_state->enc)
 
-#define NEW_BLOCK_VAR(b, v) NEW_NODE(NODE_BLOCK_PASS, 0, b, v)
+#define NEW_BLOCK_VAR(b, v)   NEW_NODE(NODE_BLOCK_PASS, 0, b, v)
+#define NEW_REQ_KW            NEW_LIT(ID2SYM(parser_intern("*")))
 
 /* Older versions of Yacc set YYMAXDEPTH to a very low value by default (150,
    for instance).  This is too low for Ruby to parse some files, such as
@@ -3065,7 +3066,7 @@ f_kw            : f_label arg_value
                   }
                 | f_label
                   {
-                    $$ = assignable($1, (NODE *)-1);
+                    $$ = assignable($1, NEW_REQ_KW);
                     $$ = NEW_KW_ARG(0, $$);
                   }
                 ;
@@ -3077,7 +3078,7 @@ f_block_kw      : f_label primary_value
                   }
                 | f_label
                   {
-                    $$ = assignable($1, (NODE *)-1);
+                    $$ = assignable($1, NEW_REQ_KW);
                     $$ = NEW_KW_ARG(0, $$);
                   }
                 ;

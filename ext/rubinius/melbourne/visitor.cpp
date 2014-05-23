@@ -717,32 +717,8 @@ namespace MELBOURNE {
       ID* args_ary = 0;
 
       struct rb_args_info *ainfo = node->nd_ainfo;
-      // NODE* aux = node->nd_args;
-      // NODE* post_args = ainfo->post_init;
       NODE* masgn = 0;
       NODE* next = 0;
-
-      // if(post_args && post_args->nd_next && nd_type(post_args->nd_next) == NODE_AND) {
-      //   if(post_args->nd_next->nd_head) {
-      //     if (nd_type(post_args->nd_next->nd_head) == NODE_BLOCK) {
-      //       masgn = post_args->nd_next->nd_head->nd_head;
-      //       next = post_args->nd_next->nd_head->nd_next;
-      //     } else {
-      //       masgn = post_args->nd_next->nd_head;
-      //       next = masgn->nd_next;
-      //       // -1 comes from: mlhs_head tSTAR
-      //       if(masgn->nd_cnt == -1) next = 0;
-      //     }
-      //   } else {
-      //     masgn = post_args->nd_next->nd_2nd;
-      //     if(masgn) {
-      //       next = masgn->nd_next;
-      //       if (nd_type(masgn) == NODE_BLOCK) {
-      //         masgn = masgn->nd_head;
-      //       }
-      //     }
-      //   }
-      // }
 
       if(ainfo->pre_args_num > 0) {
         total_args = (int)locals[0];
@@ -777,10 +753,10 @@ namespace MELBOURNE {
         kwargs = process_parse_tree(parser_state, ptp, ainfo->kw_args, locals);
       }
 
-      if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
-        splat = Qtrue;
-      } else if(ainfo->rest_arg) {
-        if(ainfo->rest_arg == 1) {
+      if(ainfo->rest_arg) {
+        if(INTERNAL_ID_P(ainfo->rest_arg)) {
+          splat = Qtrue;
+        } else if(ainfo->rest_arg == 1) {
           // m { |a,| ... }
           splat = Qfalse;
         } else {
@@ -788,11 +764,10 @@ namespace MELBOURNE {
         }
       }
 
-      if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
-        kwrest = Qtrue;
-      } else if(ainfo->kw_rest_arg->nd_vid) {
-        if(ainfo->kw_rest_arg->nd_vid == 1) {
-          // m { |a,| ... }
+      if(ainfo->kw_rest_arg) {
+        if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
+          kwrest = Qtrue;
+        } else if(ainfo->kw_rest_arg->nd_vid == 1) {
           kwrest = Qfalse;
         } else {
           kwrest = ID2SYM(ainfo->kw_rest_arg->nd_vid);
