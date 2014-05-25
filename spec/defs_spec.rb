@@ -37,7 +37,18 @@ describe "A Defs node" do
     [:defs,
      [:call, nil, :x, [:arglist]],
      :m,
-     [:args, :a, :b, :"*c", :d, :"&l", [:block, [:lasgn, :b, [:lit, 1]]]],
+     [:args,
+      :a,
+      :b,
+      :"*c",
+      :d,
+      :e,
+      :f,
+      :g,
+      :"**k",
+      :"&l",
+      [:block, [:lasgn, :b, [:lit, 1]]],
+      [:block, [:e, :f, :g], [[:lasgn, :f, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -49,7 +60,18 @@ describe "A Defs node" do
     [:defs,
      [:call, nil, :x, [:arglist]],
      :m,
-     [:args, :a, :b, :"*c", :d, :"&l", [:block, [:lasgn, :b, [:lit, 1]]]],
+     [:args,
+      :a,
+      :b,
+      :"*c",
+      :d,
+      :e,
+      :f,
+      :g,
+      :"**k",
+      :"&l",
+      [:block, [:lasgn, :b, [:lit, 1]]],
+      [:block, [:e, :f, :g], [[:lasgn, :f, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 end
