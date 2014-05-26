@@ -765,10 +765,8 @@ namespace MELBOURNE {
       }
 
       if(ainfo->kw_rest_arg) {
-        if(INTERNAL_ID_P(ainfo->kw_rest_arg->nd_vid)) {
+        if(ainfo->kw_rest_arg == (NODE*)1) {
           kwrest = Qtrue;
-        } else if(ainfo->kw_rest_arg->nd_vid == 1) {
-          kwrest = Qfalse;
         } else {
           kwrest = ID2SYM(ainfo->kw_rest_arg->nd_vid);
         }

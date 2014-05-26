@@ -2593,42 +2593,25 @@ word            : string_content
                 ;
 
 symbols         : tSYMBOLS_BEG ' ' tSTRING_END
-                {
-                  /*%%%*/
-                  $$ = NEW_ZARRAY();
-                  /*%
-                    $$ = dispatch0(symbols_new);
-                    $$ = dispatch1(array, $$);
-                  %*/
-                }
+                  {
+                    $$ = NEW_ZARRAY();
+                  }
                 | tSYMBOLS_BEG symbol_list tSTRING_END
-                {
-                  /*%%%*/
+                  {
                     $$ = $2;
-                  /*%
-                    $$ = dispatch1(array, $2);
-                  %*/
-                }
+                  }
                 ;
 
 symbol_list     : /* none */
-                {
-                  /*%%%*/
+                  {
                     $$ = 0;
-                  /*%
-                    $$ = dispatch0(symbols_new);
-                  %*/
-                }
+                  }
                 | symbol_list word ' '
-                {
-                  /*%%%*/
+                  {
                     $2 = evstr2dstr($2);
                     nd_set_type($2, NODE_DSYM);
                     $$ = list_append($1, $2);
-                    /*%
-                      $$ = dispatch2(symbols_add, $1, $2);
-                    %*/
-                }
+                  }
                 ;
 
 qwords          : tQWORDS_BEG ' ' tSTRING_END
@@ -2642,22 +2625,13 @@ qwords          : tQWORDS_BEG ' ' tSTRING_END
                 ;
 
 qsymbols        : tQSYMBOLS_BEG ' ' tSTRING_END
-                {
-                  /*%%%*/
+                  {
                     $$ = NEW_ZARRAY();
-                  /*%
-                    $$ = dispatch0(qsymbols_new);
-                    $$ = dispatch1(array, $$);
-                  %*/
-                }
+                  }
                 | tQSYMBOLS_BEG qsym_list tSTRING_END
-                {
-                  /*%%%*/
+                  {
                     $$ = $2;
-                  /*%
-                    $$ = dispatch1(array, $2);
-                  %*/
-                }
+                  }
                 ;
 
 qword_list      : /* none */
@@ -2671,25 +2645,17 @@ qword_list      : /* none */
                 ;
 
 qsym_list       : /* none */
-                {
-                  /*%%%*/
+                  {
                     $$ = 0;
-                  /*%
-                    $$ = dispatch0(qsymbols_new);
-                  %*/
-                }
+                  }
                 | qsym_list tSTRING_CONTENT ' '
-                {
-                  /*%%%*/
+                  {
                     VALUE lit;
                     lit = $2->nd_lit;
                     $2->nd_lit = ID2SYM(parser_intern_str(lit));
                     nd_set_type($2, NODE_LIT);
                     $$ = list_append($1, $2);
-                  /*%
-                    $$ = dispatch2(qsymbols_add, $1, $2);
-                  %*/
-                }
+                  }
                 ;
 
 string_contents : /* none */
@@ -3124,7 +3090,7 @@ f_kwrest        : kwrest_mark tIDENTIFIER
                   }
                 | kwrest_mark
                   {
-                    $$ = internal_id();
+                    $$ = 1;
                   }
                 ;
 
@@ -3419,7 +3385,6 @@ yycompile(rb_parser_state* parser_state, char *f, int line)
   compile_for_eval = 0;
   cond_stack = 0;
   cmdarg_stack = 0;
-  command_start = TRUE;
   class_nest = 0;
   in_single = 0;
   in_def = 0;
@@ -7202,10 +7167,13 @@ parser_new_args_tail(rb_parser_state* parser_state, NODE *k, ID kr, ID b)
 
   args->block_arg      = b;
   args->kw_args        = k;
-  if (k && !kr) kr = internal_id();
-  if (kr) {
-    arg_var(kr);
-    kw_rest_arg  = NEW_DVAR(kr);
+  if(kr) {
+    if(kr == 1) {
+      kw_rest_arg = (NODE*)kr;
+    } else {
+      arg_var(kr);
+      kw_rest_arg  = NEW_DVAR(kr);
+    }
   }
   args->kw_rest_arg    = kw_rest_arg;
 
