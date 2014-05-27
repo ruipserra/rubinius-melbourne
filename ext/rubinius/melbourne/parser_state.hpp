@@ -50,6 +50,7 @@ typedef VALUE stack_type;
     int class_nest;
     int in_single;
     int in_def;
+    int brace_nest;
     int compile_for_eval;
     ID cur_mid;
     char *token_buffer;
@@ -143,6 +144,7 @@ typedef VALUE stack_type;
 #define class_nest          PARSER_VAR(class_nest)
 #define in_single           PARSER_VAR(in_single)
 #define in_def              PARSER_VAR(in_def)
+#define brace_nest          PARSER_VAR(brace_nest)
 #define compile_for_eval    PARSER_VAR(compile_for_eval)
 #define cur_mid             PARSER_VAR(cur_mid)
 #define tokenbuf            PARSER_VAR(token_buffer)

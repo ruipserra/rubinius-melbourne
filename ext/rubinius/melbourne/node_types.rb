@@ -33,6 +33,7 @@ node_types = %w[
   op_asgn2
   op_asgn_and
   op_asgn_or
+  op_cdecl
   call
   fcall
   vcall
