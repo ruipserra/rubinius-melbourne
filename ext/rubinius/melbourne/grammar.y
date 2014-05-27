@@ -758,26 +758,6 @@ stmt            : keyword_alias fitem {lex_state = EXPR_FNAME;} fitem
                   {
                     value_expr($3);
                     $$ = new_op_assign($1, $2, $3);
-                    /*
-                    if($1) {
-                      ID vid = $1->nd_vid;
-                      if($2 == tOROP) {
-                        $1->nd_value = $3;
-                        $$ = NEW_OP_ASGN_OR(gettable(vid), $1);
-                        if(is_asgn_or_id(vid)) {
-                          $$->nd_aid = vid;
-                        }
-                      } else if($2 == tANDOP) {
-                        $1->nd_value = $3;
-                        $$ = NEW_OP_ASGN_AND(gettable(vid), $1);
-                      } else {
-                        $$ = $1;
-                        $$->nd_value = call_bin_op(gettable(vid), $2, $3);
-                      }
-                    } else {
-                      $$ = NEW_BEGIN(0);
-                    }
-                    */
                   }
                 | primary_value '[' opt_call_args rbracket tOP_ASGN command_call
                   {
@@ -800,39 +780,14 @@ stmt            : keyword_alias fitem {lex_state = EXPR_FNAME;} fitem
                   {
                     value_expr($5);
                     $$ = new_attr_op_assign($1, $3, $4, $5)
-                    /*
-                    if($4 == tOROP) {
-                      $4 = 0;
-                    } else if($4 == tANDOP) {
-                      $4 = 1;
-                    } else {
-                      $4 = convert_op($4);
-                    }
-                    $$ = NEW_OP_ASGN2($1, $3, $4, $5);
-                    fixpos($$, $1);
-                    */
                   }
                 | primary_value '.' tCONSTANT tOP_ASGN command_call
                   {
                     value_expr($5);
                     $$ = new_attr_op_assign($1, $3, $4, $5);
-                    /*
-                    if($4 == tOROP) {
-                      $4 = 0;
-                    } else if($4 == tANDOP) {
-                      $4 = 1;
-                    } else {
-                      $4 = convert_op($4);
-                    }
-                    $$ = NEW_OP_ASGN2($1, $3, $4, $5);
-                    fixpos($$, $1);
-                    */
                   }
                 | primary_value tCOLON2 tCONSTANT tOP_ASGN command_call
                   {
-                    // TODO:
-                    // yy_error("constant re-assignment");
-                    // $$ = 0;
                     $$ = NEW_COLON2($1, $3);
                     $$ = new_const_op_assign($$, $4, $5);
                   }
@@ -840,17 +795,6 @@ stmt            : keyword_alias fitem {lex_state = EXPR_FNAME;} fitem
                   {
                     value_expr($5);
                     $$ = new_attr_op_assign($1, $3, $4, $5);
-                    /*
-                    if($4 == tOROP) {
-                      $4 = 0;
-                    } else if($4 == tANDOP) {
-                      $4 = 1;
-                    } else {
-                      $4 = convert_op($4);
-                    }
-                    $$ = NEW_OP_ASGN2($1, $3, $4, $5);
-                    fixpos($$, $1);
-                    */
                   }
                 | backref tOP_ASGN command_call
                   {
@@ -1294,54 +1238,12 @@ arg             : lhs '=' arg
                   {
                     value_expr($3);
                     $$ = new_op_assign($1, $2, $3);
-                    // TODO: new_op_assign
-                    /*
-                    if($1) {
-                      ID vid = $1->nd_vid;
-                      if($2 == tOROP) {
-                        $1->nd_value = $3;
-                        $$ = NEW_OP_ASGN_OR(gettable(vid), $1);
-                        if(is_asgn_or_id(vid)) {
-                          $$->nd_aid = vid;
-                        }
-                      } else if($2 == tANDOP) {
-                        $1->nd_value = $3;
-                        $$ = NEW_OP_ASGN_AND(gettable(vid), $1);
-                      } else {
-                        $$ = $1;
-                        $$->nd_value = NEW_CALL(gettable(vid), $2, NEW_LIST($3));
-                      }
-                    } else {
-                      $$ = NEW_BEGIN(0);
-                    }
-                    */
                   }
                 | var_lhs tOP_ASGN arg modifier_rescue arg
                   {
                     value_expr($3);
                     $3 = NEW_RESCUE($3, NEW_RESBODY(0, $5, 0), 0);
                     new_op_assign($1, $2, $3);
-                    // TODO new_op_assign
-                    /*
-                    if($1) {
-                      ID vid = $1->nd_vid;
-                      if($2 == tOROP) {
-                        $1->nd_value = $3;
-                        $$ = NEW_OP_ASGN_OR(gettable(vid), $1);
-                        if(is_asgn_or_id(vid)) {
-                          $$->nd_aid = vid;
-                        }
-                      } else if($2 == tANDOP) {
-                        $1->nd_value = $3;
-                        $$ = NEW_OP_ASGN_AND(gettable(vid), $1);
-                      } else {
-                        $$ = $1;
-                        $$->nd_value = NEW_CALL(gettable(vid), $2, NEW_LIST($3));
-                      }
-                    } else {
-                      $$ = NEW_BEGIN(0);
-                    }
-                    */
                   }
                 | primary_value '[' opt_call_args rbracket tOP_ASGN arg
                   {
@@ -6819,7 +6721,7 @@ parser_new_op_assign(rb_parser_state* parser_state, NODE *lhs, ID op, NODE *rhs)
       asgn = NEW_OP_ASGN_AND(gettable(vid), lhs);
     } else {
       asgn = lhs;
-      asgn->nd_value = NEW_CALL(gettable(vid), op, NEW_LIST(rhs));
+      asgn->nd_value = call_bin_op(gettable(vid), op, NEW_LIST(rhs));
     }
   } else {
     asgn = NEW_BEGIN(0);
@@ -6838,6 +6740,8 @@ parser_new_attr_op_assign(rb_parser_state* parser_state,
     op = 0;
   } else if(op == tANDOP) {
     op = 1;
+  } else {
+    op = convert_op(op);
   }
   asgn = NEW_OP_ASGN2(lhs, attr, op, rhs);
   fixpos(asgn, lhs);
@@ -6854,7 +6758,10 @@ parser_new_const_op_assign(rb_parser_state* parser_state, NODE *lhs, ID op, NODE
     op = 0;
   } else if(op == tANDOP) {
     op = 1;
+  } else {
+    op = convert_op(op);
   }
+
   if(lhs) {
     asgn = NEW_OP_CDECL(lhs, op, rhs);
   } else {
