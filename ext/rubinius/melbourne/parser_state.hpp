@@ -12,20 +12,41 @@
 
 namespace MELBOURNE {
 
-  enum lex_state_e {
-    EXPR_BEG,       /* ignore newline, +/- is a sign. */
-    EXPR_END,       /* newline significant, +/- is an operator. */
-    EXPR_ENDARG,    /* ditto, and unbound braces. */
-    EXPR_ENDFN,     /* ditto, and unbound braces. */
-    EXPR_ARG,       /* newline significant, +/- is an operator. */
-    EXPR_CMDARG,    /* newline significant, +/- is an operator. */
-    EXPR_MID,       /* newline significant, +/- is an operator. */
-    EXPR_FNAME,     /* ignore newline, no reserved words. */
-    EXPR_DOT,       /* right after `.' or `::', no reserved words. */
-    EXPR_CLASS,     /* immediate after `class', no here document. */
-    EXPR_VALUE,     /* like EXPR_BEG but label is disallowed. */
+  enum lex_state_bits {
+    EXPR_BEG_BIT = 1,   /* ignore newline, +/- is a sign. */
+    EXPR_END_BIT,       /* newline significant, +/- is an operator. */
+    EXPR_ENDARG_BIT,    /* ditto, and unbound braces. */
+    EXPR_ENDFN_BIT,     /* ditto, and unbound braces. */
+    EXPR_ARG_BIT,       /* newline significant, +/- is an operator. */
+    EXPR_CMDARG_BIT,    /* newline significant, +/- is an operator. */
+    EXPR_MID_BIT,       /* newline significant, +/- is an operator. */
+    EXPR_FNAME_BIT,     /* ignore newline, no reserved words. */
+    EXPR_DOT_BIT,       /* right after `.' or `::', no reserved words. */
+    EXPR_CLASS_BIT,     /* immediate after `class', no here document. */
+    EXPR_VALUE_BIT,     /* like EXPR_BEG but label is disallowed. */
     EXPR_MAX_STATE
   };
+
+  enum lex_state_e {
+#define EXPR(e) EXPR_##e = (1 << EXPR_##e##_BIT)
+    EXPR(BEG),
+    EXPR(END),
+    EXPR(ENDARG),
+    EXPR(ENDFN),
+    EXPR(ARG),
+    EXPR(CMDARG),
+    EXPR(MID),
+    EXPR(FNAME),
+    EXPR(DOT),
+    EXPR(CLASS),
+    EXPR(VALUE),
+    EXPR_BEG_ANY  = (EXPR_BEG | EXPR_VALUE | EXPR_MID | EXPR_CLASS),
+    EXPR_ARG_ANY  = (EXPR_ARG | EXPR_CMDARG),
+    EXPR_END_ANY  = (EXPR_END | EXPR_ENDARG | EXPR_ENDFN)
+  };
+
+#define lex_state_of_p(x, s)  ((x) & (s))
+#define lex_state_p(s)        lex_state_of_p(lex_state, s)
 
 typedef VALUE stack_type;
 
@@ -56,6 +77,7 @@ typedef VALUE stack_type;
     char *token_buffer;
     int tokidx;
     int toksiz;
+    int tokline;
     int emit_warnings;
     /* Mirror'ing the 1.8 parser, There are 2 input methods,
        from IO and directly from a string. */
@@ -78,9 +100,9 @@ typedef VALUE stack_type;
     VALUE lex_lastline;
     VALUE lex_nextline;
 
-    char *lex_pbeg;
-    char *lex_p;
-    char *lex_pend;
+    const char *lex_pbeg;
+    const char *lex_p;
+    const char *lex_pend;
     int lex_str_used;
 
     enum lex_state_e lex_state;
@@ -150,6 +172,7 @@ typedef VALUE stack_type;
 #define tokenbuf            PARSER_VAR(token_buffer)
 #define tokidx              PARSER_VAR(tokidx)
 #define toksiz              PARSER_VAR(toksiz)
+#define tokline             PARSER_VAR(tokline)
 #define emit_warnings       PARSER_VAR(emit_warnings)
 #define lex_gets            PARSER_VAR(lex_gets)
 #define line_buffer         PARSER_VAR(line_buffer)
