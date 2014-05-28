@@ -1260,6 +1260,8 @@ arg             : lhs '=' arg
                       $5 = 0;
                     } else if($5 == tANDOP) {
                       $5 = 1;
+                    } else {
+                      $5 = convert_op($5);
                     }
                     $$ = NEW_OP_ASGN1($1, $5, args);
                     fixpos($$, $1);
