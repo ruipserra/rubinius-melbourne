@@ -2144,8 +2144,6 @@ opt_block_param : none
 block_param_def : '|' opt_bv_decl '|'
                   {
                     $$ = 0;
-                    // TODO:
-                    // $$ = $2 ? NEW_ARGS_AUX(0,$2) : 0;
                   }
                 | tOROP
                   {
@@ -2154,12 +2152,6 @@ block_param_def : '|' opt_bv_decl '|'
                 | '|' block_param opt_bv_decl '|'
                   {
                     $$ = $2;
-                    // TODO:
-                    // if($3) {
-                    //   $$ = NEW_ARGS_AUX($2, $3);
-                    // } else {
-                    //   $$ = $2;
-                    // }
                   }
                 ;
 
@@ -2174,22 +2166,12 @@ opt_bv_decl     : opt_nl
                 ;
 
 bv_decls        : bvar
-                  {
-                    // TODO
-                    // $$ = NEW_LIST($1);
-                  }
                 | bv_decls ',' bvar
-                  {
-                    // TODO
-                    // $$ = list_append($1, $3);
-                  }
                 ;
 
 bvar            : tIDENTIFIER
                   {
                     new_bv(get_id($1));
-                    // TODO
-                    // $$ = NEW_LIT(ID2SYM(get_id($1)));
                   }
                 | f_bad_arg
                   {
@@ -6689,18 +6671,6 @@ parser_arg_append(rb_parser_state* parser_state, NODE *node1, NODE *node2)
 }
 
 static NODE *
-arg_add(rb_parser_state* parser_state, NODE *node1, NODE *node2)
-{
-  if(!node1) return NEW_LIST(node2);
-  if(nd_type(node1) == NODE_ARRAY) {
-    return list_append(node1, node2);
-  }
-  else {
-    return NEW_ARGSPUSH(node1, node2);
-  }
-}
-
-static NODE *
 splat_array(NODE* node)
 {
   if(nd_type(node) == NODE_SPLAT) node = node->nd_head;
@@ -6713,7 +6683,6 @@ parser_node_assign(rb_parser_state* parser_state, NODE *lhs, NODE *rhs)
 {
   if(!lhs) return 0;
 
-  value_expr(rhs);
   switch(nd_type(lhs)) {
   case NODE_GASGN:
   case NODE_IASGN:
@@ -6722,14 +6691,13 @@ parser_node_assign(rb_parser_state* parser_state, NODE *lhs, NODE *rhs)
   case NODE_DASGN_CURR:
   case NODE_MASGN:
   case NODE_CDECL:
-  case NODE_CVDECL:
   case NODE_CVASGN:
     lhs->nd_value = rhs;
     break;
 
   case NODE_ATTRASGN:
   case NODE_CALL:
-    lhs->nd_args = arg_add(parser_state, lhs->nd_args, rhs);
+    lhs->nd_args = arg_append(lhs->nd_args, rhs);
     break;
 
   default:
@@ -6758,7 +6726,8 @@ parser_new_op_assign(rb_parser_state* parser_state, NODE *lhs, ID op, NODE *rhs)
       asgn = NEW_OP_ASGN_AND(gettable(vid), lhs);
     } else {
       asgn = lhs;
-      asgn->nd_value = call_bin_op(gettable(vid), op, NEW_LIST(rhs));
+      // TODO: is NEW_LIST(rhs) needed?
+      asgn->nd_value = call_bin_op(gettable(vid), op, rhs);
     }
   } else {
     asgn = NEW_BEGIN(0);
