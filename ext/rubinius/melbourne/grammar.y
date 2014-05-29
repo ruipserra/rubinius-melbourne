@@ -6252,6 +6252,8 @@ static NODE *
 parser_literal_concat(rb_parser_state* parser_state, NODE *head, NODE *tail)
 {
   enum node_type htype;
+  NODE *headlast;
+  VALUE lit;
 
   if(!head) return tail;
   if(!tail) return head;
@@ -6260,11 +6262,20 @@ parser_literal_concat(rb_parser_state* parser_state, NODE *head, NODE *tail)
   if(htype == NODE_EVSTR) {
     NODE *node = NEW_DSTR(STR_NEW0());
     head = list_append(node, head);
+    htype = NODE_DSTR;
   }
   switch(nd_type(tail)) {
   case NODE_STR:
+    if(htype == NODE_DSTR
+       && (headlast = head->nd_next->nd_end->nd_head)
+       && nd_type(headlast) == NODE_STR) {
+      htype = NODE_STR;
+      lit = headlast->nd_lit;
+    } else {
+      lit = head->nd_lit;
+    }
     if(htype == NODE_STR) {
-      if(!literal_concat0(head->nd_lit, tail->nd_lit)) {
+      if(!literal_concat0(lit, tail->nd_lit)) {
       error:
         return 0;
       }
@@ -6280,9 +6291,18 @@ parser_literal_concat(rb_parser_state* parser_state, NODE *head, NODE *tail)
       tail->nd_lit = head->nd_lit;
       head = tail;
     } else if(NIL_P(tail->nd_lit)) {
+    append:
       head->nd_alen += tail->nd_alen - 1;
       head->nd_next->nd_end->nd_next = tail->nd_next;
       head->nd_next->nd_end = tail->nd_next->nd_end;
+    } else if(htype == NODE_DSTR
+              && (headlast = head->nd_next->nd_end->nd_head)
+              && nd_type(headlast) == NODE_STR) {
+      lit = headlast->nd_lit;
+      if (!literal_concat0(lit, tail->nd_lit))
+      goto error;
+      tail->nd_lit = Qnil;
+      goto append;
     } else {
       nd_set_type(tail, NODE_ARRAY);
       tail->nd_head = NEW_STR(tail->nd_lit);
@@ -6601,8 +6621,6 @@ parser_aryset(rb_parser_state* parser_state, NODE *recv, NODE *idx)
 {
   if(recv && nd_type(recv) == NODE_SELF) {
     recv = (NODE *)1;
-  } else {
-    value_expr(recv);
   }
   return NEW_ATTRASGN(recv, convert_op(tASET), idx);
 }
@@ -6789,11 +6807,6 @@ parser_value_expr(rb_parser_state* parser_state, NODE *node)
 
   while(node) {
     switch(nd_type(node)) {
-    case NODE_DEFN:
-    case NODE_DEFS:
-      parser_warning(node, "void value expression");
-      return FALSE;
-
     case NODE_RETURN:
     case NODE_BREAK:
     case NODE_NEXT:
