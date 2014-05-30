@@ -15,6 +15,8 @@
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
+#include <string.h>
+
 #include "namespace.h"
 #include "melbourne.hpp"
 #include "grammar.hpp"
@@ -54,17 +56,17 @@ static int parser_yyerror(rb_parser_state*, const char *);
 
 static int yylex(void*, void *);
 
-#define BITSTACK_PUSH(stack, n) (stack = (stack<<1)|((n)&1))
-#define BITSTACK_POP(stack)     (stack >>= 1)
-#define BITSTACK_LEXPOP(stack)  (stack = (stack >> 1) | (stack & 1))
-#define BITSTACK_SET_P(stack)   (stack&1)
+#define BITSTACK_PUSH(stack, n)   ((stack) = ((stack)<<1)|((n)&1))
+#define BITSTACK_POP(stack)       ((stack) = (stack) >> 1)
+#define BITSTACK_LEXPOP(stack)    ((stack) = ((stack) >> 1) | ((stack) & 1))
+#define BITSTACK_SET_P(stack)     ((stack)&1)
 
-#define COND_PUSH(n)    BITSTACK_PUSH(cond_stack, n)
+#define COND_PUSH(n)    BITSTACK_PUSH(cond_stack, (n))
 #define COND_POP()      BITSTACK_POP(cond_stack)
 #define COND_LEXPOP()   BITSTACK_LEXPOP(cond_stack)
 #define COND_P()        BITSTACK_SET_P(cond_stack)
 
-#define CMDARG_PUSH(n)  BITSTACK_PUSH(cmdarg_stack, n)
+#define CMDARG_PUSH(n)  BITSTACK_PUSH(cmdarg_stack, (n))
 #define CMDARG_POP()    BITSTACK_POP(cmdarg_stack)
 #define CMDARG_LEXPOP() BITSTACK_LEXPOP(cmdarg_stack)
 #define CMDARG_P()      BITSTACK_SET_P(cmdarg_stack)
@@ -244,6 +246,23 @@ static int rb_compile_error(rb_parser_state* parser_state, const char *fmt, ...)
   yy_error(msg);
 
   return count;
+}
+
+static void
+rb_name_error(ID id, const char *fmt, ...)
+{
+  char msg[BUFSIZ];
+  VALUE exc, argv[2];
+  va_list args;
+
+  va_start(args, fmt);
+  vsnprintf(msg, BUFSIZ, fmt, args);
+  argv[0] = rb_str_new2(msg);
+  va_end(args);
+
+  argv[1] = ID2SYM(id);
+  exc = rb_class_new_instance(2, argv, rb_eNameError);
+  rb_exc_raise(exc);
 }
 
 static int _debug_print(const char *fmt, ...) {
@@ -4120,6 +4139,65 @@ parser_tokadd_string(rb_parser_state *parser_state,
   node_newnode(NODE_STRTERM, (VALUE)(func), \
                (VALUE)((term) | ((paren) << (CHAR_BIT * 2))), 0)
 #define pslval ((YYSTYPE *)lval)
+
+#define BIT(c, idx) (((c) / 32 - 1 == idx) ? (1U << ((c) % 32)) : 0)
+#define SPECIAL_PUNCT(idx) ( \
+	BIT('~', idx) | BIT('*', idx) | BIT('$', idx) | BIT('?', idx) | \
+	BIT('!', idx) | BIT('@', idx) | BIT('/', idx) | BIT('\\', idx) | \
+	BIT(';', idx) | BIT(',', idx) | BIT('.', idx) | BIT('=', idx) | \
+	BIT(':', idx) | BIT('<', idx) | BIT('>', idx) | BIT('\"', idx) | \
+	BIT('&', idx) | BIT('`', idx) | BIT('\'', idx) | BIT('+', idx) | \
+	BIT('0', idx))
+const unsigned int ruby_global_name_punct_bits[] = {
+    SPECIAL_PUNCT(0),
+    SPECIAL_PUNCT(1),
+    SPECIAL_PUNCT(2),
+};
+#undef BIT
+#undef SPECIAL_PUNCT
+
+static inline int
+is_global_name_punct(const int c)
+{
+  if(c <= 0x20 || 0x7e < c) return 0;
+  return (ruby_global_name_punct_bits[(c - 0x20) / 32] >> (c % 32)) & 1;
+}
+
+static int
+parser_peek_variable_name(rb_parser_state* parser_state)
+{
+  int c;
+  const char *p = lex_p;
+
+  if(p + 1 >= lex_pend) return 0;
+  c = *p++;
+  switch(c) {
+  case '$':
+    if((c = *p) == '-') {
+      if (++p >= lex_pend) return 0;
+      c = *p;
+    } else if(is_global_name_punct(c) || ISDIGIT(c)) {
+      return tSTRING_DVAR;
+    }
+    break;
+  case '@':
+    if((c = *p) == '@') {
+      if(++p >= lex_pend) return 0;
+      c = *p;
+    }
+    break;
+  case '{':
+    lex_p = p;
+    command_start = TRUE;
+    return tSTRING_DBEG;
+  default:
+    return 0;
+  }
+  if(!ISASCII(c) || c == '_' || ISALPHA(c)) return tSTRING_DVAR;
+
+  return 0;
+}
+
 static int
 parser_parse_string(rb_parser_state* parser_state, NODE *quote)
 {
@@ -4152,15 +4230,10 @@ parser_parse_string(rb_parser_state* parser_state, NODE *quote)
   }
   newtok();
   if((func & STR_FUNC_EXPAND) && c == '#') {
-    switch(c = nextc()) {
-    case '$':
-    case '@':
-      pushback(c);
-      return tSTRING_DVAR;
-    case '{':
-      return tSTRING_DBEG;
-    }
+    int t = parser_peek_variable_name(parser_state);
+    if(t) return t;
     tokadd('#');
+    c = nextc();
   }
   pushback(c);
   if(tokadd_string(func, term, paren, &quote->nd_nest, &enc) == -1) {
@@ -4273,6 +4346,7 @@ parser_heredoc_restore(rb_parser_state* parser_state, NODE *here)
 {
   VALUE line;
 
+  lex_strterm = 0;
   line = here->nd_orig;
   lex_lastline = line;
   lex_pbeg = RSTRING_PTR(line);
@@ -4292,9 +4366,12 @@ parser_whole_match_p(rb_parser_state* parser_state, const char *eos, ssize_t len
     while(*p && ISSPACE(*p)) p++;
   }
   n = lex_pend - (p + len);
-  if(n < 0 || (n > 0 && p[len] != '\n' && p[len] != '\r')) return FALSE;
-  if(strncmp(eos, p, len) == 0) return TRUE;
-  return FALSE;
+  if(n < 0) return FALSE;
+  if(n > 0 && p[len] != '\n') {
+    if(p[len] != '\r') return FALSE;
+    if(n <= 1 || p[len+1] != '\n') return FALSE;
+  }
+  return strncmp(eos, p, len) == 0;
 }
 
 #define NUM_SUFFIX_R   (1<<0)
@@ -4361,8 +4438,7 @@ static int
 parser_here_document(rb_parser_state* parser_state, NODE *here)
 {
   int c, func, indent = 0;
-  char *eos, *p;
-  const char *pend;
+  const char *eos, *p, *pend;
   ssize_t len;
   VALUE str = 0;
   rb_encoding* enc = parser_state->enc;
@@ -4380,7 +4456,6 @@ parser_here_document(rb_parser_state* parser_state, NODE *here)
     rb_compile_error(parser_state, "can't find string \"%s\" anywhere before EOF", eos);
   restore:
     heredoc_restore(lex_strterm);
-    lex_strterm = 0;
     return 0;
   }
   /* Gr. not yet sure what was_bol() means other than it seems like
@@ -4423,15 +4498,10 @@ parser_here_document(rb_parser_state* parser_state, NODE *here)
   } else {
     newtok();
     if(c == '#') {
-      switch(c = nextc()) {
-      case '$':
-      case '@':
-        pushback(c);
-        return tSTRING_DVAR;
-      case '{':
-        return tSTRING_DBEG;
-      }
+      int t = parser_peek_variable_name(parser_state);
+      if(t) return t;
       tokadd('#');
+      c = nextc();
     }
 
     /* Loop while we haven't found a the heredoc ident. */
@@ -4760,29 +4830,23 @@ parser_prepare(rb_parser_state* parser_state)
   parser_state->enc = parser_enc_get(lex_lastline);
 }
 
-#define IS_ARG()              (lex_state == EXPR_ARG \
-                               || lex_state == EXPR_CMDARG)
-#define IS_END()              (lex_state == EXPR_END \
-                               || lex_state == EXPR_ENDARG \
-                               || lex_state == EXPR_ENDFN)
-#define IS_BEG()              (lex_state == EXPR_BEG \
-                               || lex_state == EXPR_MID \
-                               || lex_state == EXPR_VALUE \
-                               || lex_state == EXPR_CLASS)
+#define IS_ARG()              lex_state_p(EXPR_ARG_ANY)
+#define IS_END()              lex_state_p(EXPR_END_ANY)
+#define IS_BEG()              lex_state_p(EXPR_BEG_ANY)
 #define IS_SPCARG(c)          (IS_ARG() && space_seen && !ISSPACE(c))
-#define IS_LABEL_POSSIBLE()   ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG())
+#define IS_LABEL_POSSIBLE()   ((lex_state_p(EXPR_BEG | EXPR_ENDFN) && !cmd_state) \
+                                || IS_ARG())
 #define IS_LABEL_SUFFIX(n)    (peek_n(':',(n)) && !peek_n(':', (n)+1))
 #define IS_AFTER_OPERATOR()   lex_state_p(EXPR_FNAME | EXPR_DOT)
 
 #define ambiguous_operator(op, syn) ( \
     rb_warning0("`" op "' after local variable is interpreted as binary operator"), \
     rb_warning0("even though it seems like " syn ""))
-#define warn_balanced(op, syn) \
-    (last_state != EXPR_CLASS && last_state != EXPR_DOT && \
-     last_state != EXPR_FNAME && last_state != EXPR_ENDFN && \
-     last_state != EXPR_ENDARG && \
-     space_seen && !ISSPACE(c) && \
-     (ambiguous_operator(op, syn), 0))
+#define warn_balanced(op, syn) ((void) \
+    (!lex_state_of_p(last_state, \
+      EXPR_CLASS|EXPR_DOT|EXPR_FNAME|EXPR_ENDFN|EXPR_ENDARG) && \
+    space_seen && !ISSPACE(c) && \
+    (ambiguous_operator(op, syn), 0)))
 
 static int
 parser_yylex(rb_parser_state *parser_state)
@@ -5030,10 +5094,11 @@ retry:
       return c;
     }
     if(lex_state_p(EXPR_DOT)) {
-      if(cmd_state)
+      if(cmd_state) {
         lex_state = EXPR_CMDARG;
-      else
+      } else {
         lex_state = EXPR_ARG;
+      }
       return c;
     }
     lex_strterm = NEW_STRTERM(str_xquote, '`', 0);
@@ -6633,9 +6698,44 @@ parser_block_dup_check(rb_parser_state* parser_state, NODE *node1, NODE *node2)
   }
 }
 
+static const char id_type_names[][9] = {
+  "LOCAL",
+  "INSTANCE",
+  "",				/* INSTANCE2 */
+  "GLOBAL",
+  "ATTRSET",
+  "CONST",
+  "CLASS",
+  "JUNK",
+};
+
 static ID
 rb_id_attrset(ID id)
 {
+  if(!is_notop_id(id)) {
+    switch (id) {
+    case tAREF:
+    case tASET:
+      return tASET;	/* only exception */
+    }
+    rb_name_error(id, "cannot make operator ID :%s attrset", rb_id2name(id));
+  } else {
+    int scope = (int)(id & ID_SCOPE_MASK);
+    switch(scope) {
+    case ID_LOCAL:
+    case ID_INSTANCE:
+    case ID_GLOBAL:
+    case ID_CONST:
+    case ID_CLASS:
+    case ID_JUNK:
+      break;
+    case ID_ATTRSET:
+      return id;
+    default:
+      rb_name_error(id, "cannot make %s ID %+ld attrset",
+                    id_type_names[scope], ID2SYM(id));
+    }
+  }
   id &= ~ID_SCOPE_MASK;
   id |= ID_ATTRSET;
   return id;
