@@ -13,7 +13,7 @@
 namespace MELBOURNE {
 
   enum lex_state_bits {
-    EXPR_BEG_BIT = 1,   /* ignore newline, +/- is a sign. */
+    EXPR_BEG_BIT = 0,   /* ignore newline, +/- is a sign. */
     EXPR_END_BIT,       /* newline significant, +/- is an operator. */
     EXPR_ENDARG_BIT,    /* ditto, and unbound braces. */
     EXPR_ENDFN_BIT,     /* ditto, and unbound braces. */
