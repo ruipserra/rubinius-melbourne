@@ -31,6 +31,24 @@ describe "A Defs node" do
   end
 
   parse <<-ruby do
+      def x.m(a=1, (b, (c, *d), *e)) end
+    ruby
+
+    [:defs,
+     [:call, nil, :x, [:arglist]],
+     :m,
+     [:args,
+      :a,
+      [:masgn,
+       [:array,
+        [:lasgn, :b],
+        [:masgn, [:array, [:lasgn, :c], [:splat, :d]]],
+        [:splat, :e]]],
+      [:block, [:lasgn, :a, [:lit, 1]]]],
+     [:scope, [:block, [:nil]]]]
+  end
+
+  parse <<-ruby do
       def x.m(a, b=1, *c, d, e:, f: 2, g:, **k, &l) end
     ruby
 

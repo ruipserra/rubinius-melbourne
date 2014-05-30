@@ -23,6 +23,18 @@ describe "A Lambda node" do
     [:lambda, [:args, :a, :b], [:scope, [:call, nil, :x, [:arglist]]]]
   end
 
+  parse "-> (a, (b, (c, *d), *e)) { }" do
+    [:lambda,
+     [:args,
+      :a,
+      [:masgn,
+       [:array,
+        [:lasgn, :b],
+        [:masgn, [:array, [:lasgn, :c], [:splat, :d]]],
+        [:splat, :e]]]],
+     [:scope, [:nil]]]
+  end
+
   parse "-> (a=1) { }" do
     [:lambda, [:args, :a, [:block, [:lasgn, :a, [:lit, 1]]]], [:scope, [:nil]]]
   end

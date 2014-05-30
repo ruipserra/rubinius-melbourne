@@ -91,6 +91,32 @@ describe "A Defn node" do
   end
 
   parse <<-ruby do
+      def m(a, (b, c)) end
+    ruby
+
+    [:defn,
+     :m,
+     [:args, :a, [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]]]],
+     [:scope, [:block, [:nil]]]]
+  end
+
+  parse <<-ruby do
+      def m(a, (b, (c, *d), *e)) end
+    ruby
+
+    [:defn,
+     :m,
+     [:args,
+      :a,
+      [:masgn,
+       [:array,
+        [:lasgn, :b],
+        [:masgn, [:array, [:lasgn, :c], [:splat, :d]]],
+        [:splat, :e]]]],
+     [:scope, [:block, [:nil]]]]
+  end
+
+  parse <<-ruby do
       def m(a, b=1) end
     ruby
 
@@ -179,6 +205,50 @@ describe "A Defn node" do
     [:defn,
      :m,
      [:args, :a, :"*b", [:block, [:lasgn, :a, [:lit, 1]]]],
+     [:scope, [:block, [:nil]]]]
+  end
+
+  parse <<-ruby do
+      def m(a=1, (b, (c, *d))) end
+    ruby
+
+    [:defn,
+     :m,
+     [:args,
+      :a,
+      [:masgn,
+       [:array, [:lasgn, :b], [:masgn, [:array, [:lasgn, :c], [:splat, :d]]]]],
+      [:block, [:lasgn, :a, [:lit, 1]]]],
+     [:scope, [:block, [:nil]]]]
+  end
+
+  parse <<-ruby do
+      def m(a=1, (b, c)) end
+    ruby
+
+    [:defn,
+     :m,
+     [:args,
+      :a,
+      [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]]],
+      [:block, [:lasgn, :a, [:lit, 1]]]],
+     [:scope, [:block, [:nil]]]]
+  end
+
+  parse <<-ruby do
+      def m(a=1, (b, (c, *d), *e)) end
+    ruby
+
+    [:defn,
+     :m,
+     [:args,
+      :a,
+      [:masgn,
+       [:array,
+        [:lasgn, :b],
+        [:masgn, [:array, [:lasgn, :c], [:splat, :d]]],
+        [:splat, :e]]],
+      [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
 

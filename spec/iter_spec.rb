@@ -27,6 +27,16 @@ describe "An Iter node" do
     [:call, nil, :m, [:arglist, [:iter, [:args, :a], [:nil]]]]
   end
 
+  parse "m { |a, (b, c)| }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter,
+       [:args, :a, [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]]]],
+       [:nil]]]]
+  end
+
   parse "m { |a; x| }" do
     [:call, nil, :m, [:arglist, [:iter, [:args, :a], [:nil]]]]
   end
@@ -36,6 +46,23 @@ describe "An Iter node" do
      nil,
      :m,
      [:arglist, [:iter, [:args, :a, [:block, [:lasgn, :a, [:lit, 1]]]], [:nil]]]]
+  end
+
+  parse "m { |a=1, (b, (c, *d), *e)| }" do
+    [:call,
+     nil,
+     :m,
+     [:arglist,
+      [:iter,
+       [:args,
+        :a,
+        [:masgn,
+         [:array,
+          [:lasgn, :b],
+          [:masgn, [:array, [:lasgn, :c], [:splat, :d]]],
+          [:splat, :e]]],
+        [:block, [:lasgn, :a, [:lit, 1]]]],
+       [:nil]]]]
   end
 
   parse "m { |a=1; x| }" do
