@@ -723,6 +723,7 @@ namespace MELBOURNE {
       if(ainfo->pre_args_num > 0) {
         total_args = (int)locals[0];
         args_ary = locals + 1;
+        masgn = ainfo->pre_init;
 
         args = rb_ary_new();
         for(int i = 0; i < ainfo->pre_args_num && i < total_args; i++) {
@@ -777,6 +778,7 @@ namespace MELBOURNE {
       if(ainfo->post_args_num > 0) {
         total_args = (int)locals[0];
         args_ary = locals + 1;
+        masgn = ainfo->post_init;
 
         int start;
         for(start = 0; start < total_args; start++) {
