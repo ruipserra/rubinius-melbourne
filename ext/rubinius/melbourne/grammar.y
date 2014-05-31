@@ -2164,7 +2164,8 @@ opt_block_param : none
 
 block_param_def : '|' opt_bv_decl '|'
                   {
-                    $$ = 0;
+                    // This is deliberately different than MRI.
+                    $$ = $2 ? NEW_ARGS_AUX(0, $2) : 0;
                   }
                 | tOROP
                   {
@@ -2172,7 +2173,8 @@ block_param_def : '|' opt_bv_decl '|'
                   }
                 | '|' block_param opt_bv_decl '|'
                   {
-                    $$ = $2;
+                    // This is deliberately different than MRI.
+                    $$ = $3 ? NEW_ARGS_AUX($2, $3) : $2;
                   }
                 ;
 
@@ -2182,17 +2184,28 @@ opt_bv_decl     : opt_nl
                   }
                 | opt_nl ';' bv_decls
                   {
-                    $$ = 0;
+                    // This is deliberately different than MRI.
+                    $$ = $3;
                   }
                 ;
 
 bv_decls        : bvar
+                  {
+                    // This is deliberately different than MRI.
+                    $$ = NEW_LIST($1);
+                  }
                 | bv_decls ',' bvar
+                  {
+                    // This is deliberately different than MRI.
+                    $$ = list_append($1, $3);
+                  }
                 ;
 
 bvar            : tIDENTIFIER
                   {
                     new_bv(get_id($1));
+                    // This is deliberately different than MRI.
+                    $$ = NEW_LIT(ID2SYM(get_id($1)));
                   }
                 | f_bad_arg
                   {
