@@ -31,7 +31,7 @@ describe "A Flip2 node" do
 
     [:if,
      [:flip2,
-      [:call, [:lit, 1], :==, [:arglist, [:gvar, :$.]]],
+      [:lit, 1],
       [:call, [:lit, 2], :a?, [:arglist, [:call, nil, :b, [:arglist]]]]],
      [:nil],
      nil]
