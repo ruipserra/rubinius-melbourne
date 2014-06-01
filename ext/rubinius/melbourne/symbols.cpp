@@ -57,6 +57,7 @@ namespace MELBOURNE {
   ID rb_sHash;
   ID rb_sIAsgn;
   ID rb_sIf;
+  ID rb_sImaginary;
   ID rb_sIter;
   ID rb_sIVar;
   ID rb_sKwArg;
@@ -84,6 +85,7 @@ namespace MELBOURNE {
   ID rb_sPostExe;
   ID rb_sPostArg;
   ID rb_sPreExe;
+  ID rb_sRational;
   ID rb_sRedo;
   ID rb_sRegex;
   ID rb_sResbody;
@@ -170,6 +172,7 @@ namespace MELBOURNE {
     rb_sHash        = rb_intern("process_hash");
     rb_sIAsgn       = rb_intern("process_iasgn");
     rb_sIf          = rb_intern("process_if");
+    rb_sImaginary   = rb_intern("process_imaginary");
     rb_sIter        = rb_intern("process_iter");
     rb_sIVar        = rb_intern("process_ivar");
     rb_sKwArg       = rb_intern("process_kw_arg");
@@ -197,6 +200,7 @@ namespace MELBOURNE {
     rb_sPostExe     = rb_intern("process_postexe");
     rb_sPostArg     = rb_intern("process_postarg");
     rb_sPreExe      = rb_intern("process_preexe");
+    rb_sRational    = rb_intern("process_rational");
     rb_sRedo        = rb_intern("process_redo");
     rb_sRegex       = rb_intern("process_regex");
     rb_sResbody     = rb_intern("process_resbody");

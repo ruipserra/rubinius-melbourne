@@ -868,6 +868,14 @@ namespace MELBOURNE {
       tree = rb_funcall(ptp, rb_sFloat, 2, line, node->nd_lit);
       break;
 
+    case NODE_IMAGINARY:
+      tree = rb_funcall(ptp, rb_sImaginary, 2, line, node->nd_lit);
+      break;
+
+    case NODE_RATIONAL:
+      tree = rb_funcall(ptp, rb_sRational, 2, line, node->nd_lit);
+      break;
+
     case NODE_NTH_REF:          /* u2 u3 ($1) - u3 is local_cnt('~') ignorable? */
       tree = rb_funcall(ptp, rb_sNthRef, 2, line, INT2FIX(node->nd_nth));
       break;

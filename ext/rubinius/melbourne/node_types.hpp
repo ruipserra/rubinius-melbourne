@@ -116,7 +116,9 @@ namespace MELBOURNE {
     NODE_NUMBER,
     NODE_FLOAT,
     NODE_ENCODING,
-    NODE_PREEXE
+    NODE_PREEXE,
+    NODE_RATIONAL,
+    NODE_IMAGINARY
   };
 
   const char *get_node_type_string(enum node_type nt);

@@ -56,6 +56,7 @@ namespace MELBOURNE {
   extern ID rb_sHash;
   extern ID rb_sIAsgn;
   extern ID rb_sIf;
+  extern ID rb_sImaginary;
   extern ID rb_sIter;
   extern ID rb_sIVar;
   extern ID rb_sKwArg;
@@ -83,6 +84,7 @@ namespace MELBOURNE {
   extern ID rb_sPostExe;
   extern ID rb_sPostArg;
   extern ID rb_sPreExe;
+  extern ID rb_sRational;
   extern ID rb_sRedo;
   extern ID rb_sRegex;
   extern ID rb_sResbody;

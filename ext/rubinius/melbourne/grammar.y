@@ -3343,6 +3343,8 @@ static int parser_here_document(rb_parser_state*, NODE*);
 #define set_yylval_literal(x)     yylval.node = NEW_LIT(x)
 #define set_yylval_number(x)      yylval.node = NEW_NUMBER(x)
 #define set_yylval_float(x)       yylval.node = NEW_FLOAT(x)
+#define set_yylval_rational(x)    yylval.node = NEW_RATIONAL(x)
+#define set_yylval_imaginary(x)   yylval.node = NEW_IMAGINARY(x)
 #define set_yylval_node(x)        yylval.node = x
 #define yylval_id()               yylval.id
 
@@ -4430,7 +4432,25 @@ parser_set_number_literal(rb_parser_state* parser_state, VALUE v, int type, int 
     v = rb_funcall(rb_cObject, rb_intern("Complex"), 2, INT2FIX(0), v);
     type = tIMAGINARY;
   }
-  set_yylval_literal(v);
+
+  switch(type) {
+  case tFLOAT:
+    set_yylval_float(v);
+    break;
+  case tINTEGER:
+    set_yylval_number(v);
+    break;
+  case tRATIONAL:
+    set_yylval_rational(v);
+    break;
+  case tIMAGINARY:
+    set_yylval_imaginary(v);
+    break;
+  default:
+    set_yylval_literal(v);
+    break;
+  }
+
   return type;
 }
 

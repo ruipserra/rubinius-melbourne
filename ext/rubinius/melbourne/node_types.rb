@@ -112,6 +112,8 @@ node_types = %w[
   float
   encoding
   preexe
+  rational
+  imaginary
 ]
 
 def write_node_types(list)

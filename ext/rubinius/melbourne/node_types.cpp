@@ -120,6 +120,8 @@ namespace MELBOURNE {
     "float\0"
     "encoding\0"
     "preexe\0"
+    "rational\0"
+    "imaginary\0"
   };
 
   static const unsigned short node_types_offsets[] = {
@@ -236,11 +238,13 @@ namespace MELBOURNE {
     714,
     720,
     729,
-    736
+    736,
+    745,
+    755
   };
 
   const char *get_node_type_string(enum node_type node) {
-    if(node < 113) {
+    if(node < 115) {
       return node_types + node_types_offsets[node];
     } else {
 #define NODE_STRING_MESSAGE_LEN 20
