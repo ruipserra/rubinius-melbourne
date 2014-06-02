@@ -204,6 +204,30 @@ describe "A Defn node" do
   end
 
   parse <<-ruby do
+      def m(a, (b, (c, *d, (e, (*f)), g), (h, (i, j)))) end
+    ruby
+
+    [:defn,
+     :m,
+     [:args,
+      :a,
+      [:masgn,
+       [:array,
+        [:lasgn, :b],
+        [:masgn,
+         [:array,
+          [:lasgn, :c],
+          [:splat, :d],
+          [:lasgn, :g],
+          [:masgn, [:array, [:lasgn, :e], [:masgn, [:array, [:splat, :f]]]]]]],
+        [:masgn,
+         [:array,
+          [:lasgn, :h],
+          [:masgn, [:array, [:lasgn, :i], [:lasgn, :j]]]]]]]],
+     [:scope, [:block, [:nil]]]]
+  end
+
+  parse <<-ruby do
       def m(a, b=1) end
     ruby
 
