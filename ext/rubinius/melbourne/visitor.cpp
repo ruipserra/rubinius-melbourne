@@ -723,7 +723,12 @@ namespace MELBOURNE {
       if(ainfo->pre_args_num > 0) {
         total_args = (int)locals[0];
         args_ary = locals + 1;
+
         masgn = ainfo->pre_init;
+        if(masgn && nd_type(masgn) == NODE_BLOCK) {
+          next = masgn->nd_next;
+          masgn = masgn->nd_head;
+        }
 
         args = rb_ary_new();
         for(int i = 0; i < ainfo->pre_args_num && i < total_args; i++) {
@@ -733,12 +738,10 @@ namespace MELBOURNE {
             arg = ID2SYM(args_ary[i]);
           } else if(masgn) {
             arg = process_parse_tree(parser_state, ptp, masgn, locals);
-            if(next && nd_type(next) == NODE_BLOCK) {
+
+            if(next) {
               masgn = next->nd_head;
               next = next->nd_next;
-            } else {
-              masgn = next;
-              if(masgn) next = masgn->nd_next;
             }
           }
 
@@ -778,7 +781,14 @@ namespace MELBOURNE {
       if(ainfo->post_args_num > 0) {
         total_args = (int)locals[0];
         args_ary = locals + 1;
+
         masgn = ainfo->post_init;
+        if(masgn && nd_type(masgn) == NODE_BLOCK) {
+          next = masgn->nd_next;
+          masgn = masgn->nd_head;
+        } else {
+          next = 0;
+        }
 
         int start;
         for(start = 0; start < total_args; start++) {
@@ -794,19 +804,18 @@ namespace MELBOURNE {
             arg = ID2SYM(args_ary[start + i]);
           } else if(masgn) {
             arg = process_parse_tree(parser_state, ptp, masgn, locals);
-            if(next && nd_type(next) == NODE_BLOCK) {
+
+            if(next) {
               masgn = next->nd_head;
               next = next->nd_next;
-            } else {
-              masgn = next;
-              if(masgn) next = masgn->nd_next;
             }
           }
           rb_ary_push(post, arg);
         }
       }
 
-      tree = rb_funcall(ptp, rb_sArgs, 8, line, args, opts, splat, post, kwargs, kwrest, block);
+      tree = rb_funcall(ptp, rb_sArgs, 8, line, args, opts, splat,
+                        post, kwargs, kwrest, block);
       break;
     }
     case NODE_LVAR:
