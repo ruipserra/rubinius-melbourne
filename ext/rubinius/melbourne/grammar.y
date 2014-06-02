@@ -696,7 +696,6 @@ stmt_or_begin   : stmt
                   }
                 '{' top_compstmt '}'
                   {
-                    // TODO: block_append
                     $$ = NEW_BEGIN(0);
                   }
                 ;
@@ -2230,26 +2229,16 @@ lambda          : {
                     $$ = NEW_LAMBDA($3, $5);
                     nd_set_line($$, $<num>4);
                     bv_pop($<vars>1);
-                    // TODO:
-                    /*
-                    $$ = $3;
-                    $$->nd_body = NEW_SCOPE($3->nd_head, $4);
-                    bv_pop($<vars>1);
-                    */
                   }
                 ;
 
 f_larglist      : '(' f_args opt_bv_decl ')'
                   {
-                    // TODO: $$ = $2;
                     $$ = $2;
-                    // $$ = NEW_LAMBDA($2);
                   }
                 | f_args
                   {
-                    // TODO: $$ = $1;
                     $$ = $1;
-                    // $$ = NEW_LAMBDA($1);
                   }
                 ;
 
@@ -5877,10 +5866,6 @@ retry:
       tokadd('$');
       tokadd(c);
       goto gvar;
-      // TODO
-      // tokfix();
-      // set_yylval_name(parser_intern(tok()));
-      // return tGVAR;
 
     case '-':
       tokadd('$');
