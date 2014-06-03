@@ -19,7 +19,7 @@ describe "A Lambda node" do
     [:lambda, [:args, :a, :b], [:scope, [:nil]]]
   end
 
-  parse "-> (a, b) { x }" do
+  parse "-> a, b { x }" do
     [:lambda, [:args, :a, :b], [:scope, [:call, nil, :x, [:arglist]]]]
   end
 
@@ -85,7 +85,7 @@ describe "A Lambda node" do
      [:scope, [:nil]]]
   end
 
-  parse "-> (a, b=1, *c, d, e:, f: 2, g:, **k, &l) { x + a }" do
+  parse "-> a, b=1, *c, d, e:, f: 2, g:, **k, &l { x + a }" do
     [:lambda,
      [:args,
       :a,
