@@ -182,7 +182,7 @@ describe "A Defn node" do
      :m,
      [:args,
       [:masgn, [:array, [:lasgn, :a], [:lasgn, :b], [:splat, :c], [:lasgn, :d]]],
-      [:masgn, [:array, [:splat, :e], [:lasgn, :g], [:lasgn, :f]]],
+      [:masgn, [:array, [:splat, :e], [:lasgn, :f], [:lasgn, :g]]],
       [:masgn, [:array, [:splat, :h]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -218,8 +218,8 @@ describe "A Defn node" do
          [:array,
           [:lasgn, :c],
           [:splat, :d],
-          [:lasgn, :g],
-          [:masgn, [:array, [:lasgn, :e], [:masgn, [:array, [:splat, :f]]]]]]],
+          [:masgn, [:array, [:lasgn, :e], [:masgn, [:array, [:splat, :f]]]]],
+          [:lasgn, :g]]],
         [:masgn,
          [:array,
           [:lasgn, :h],
