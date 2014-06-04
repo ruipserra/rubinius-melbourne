@@ -577,13 +577,14 @@ namespace MELBOURNE {
 
       node = node->nd_head;
       while (node) {
-        rb_ary_push(array, process_parse_tree(parser_state, ptp, node->nd_head, locals));
-        if (!(node = node->nd_next)) {
-          // @todo: properly process the parse error
-          printf("odd number list for Hash");
-          abort();
+        if(node->nd_head) {
+          rb_ary_push(array, process_parse_tree(parser_state, ptp, node->nd_head, locals));
+          if (!(node = node->nd_next)) break;
+          rb_ary_push(array, process_parse_tree(parser_state, ptp, node->nd_head, locals));
+        } else {
+          // Marker for Hash splat.
+          rb_ary_push(array, Qnil);
         }
-        rb_ary_push(array, process_parse_tree(parser_state, ptp, node->nd_head, locals));
         node = node->nd_next;
       }
       tree = rb_funcall(ptp, rb_sHash, 2, line, array);
