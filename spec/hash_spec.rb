@@ -30,6 +30,7 @@ describe "A Hash node" do
     ruby
 
     [:hash,
+     [:hash_splat],
      [:hash, [:lit, :a], [:lit, 1], [:lit, :b], [:lit, 2]],
      [:lit, :b],
      [:lit, 2]]
@@ -42,6 +43,7 @@ describe "A Hash node" do
     [:hash,
      [:lit, :a],
      [:lit, 1],
+     [:hash_splat],
      [:hash, [:lit, :b], [:lit, 2]],
      [:lit, :c],
      [:lit, 3]]
@@ -54,7 +56,7 @@ describe "A Hash node" do
 
     [:block,
      [:lasgn, :h, [:hash, [:lit, :a], [:lit, 1]]],
-     [:hash, [:lit, :b], [:lit, 2], [:lvar, :h]]]
+     [:hash, [:lit, :b], [:lit, 2], [:hash_splat], [:lvar, :h]]]
   end
 
   parse <<-ruby do
@@ -64,6 +66,7 @@ describe "A Hash node" do
     [:hash,
      [:lit, :a],
      [:lit, 1],
+     [:hash_splat],
      [:call, nil, :h, [:arglist]],
      [:lit, :c],
      [:lit, 3]]
