@@ -24,4 +24,48 @@ describe "A Hash node" do
       [:lasgn, :a, [:lit, 1]],
       [:hash, [:lit, :a], [:lvar, :a]]]
   end
+
+  parse <<-ruby do
+      { **{ a: 1, b: 2 }, b: 2 }
+    ruby
+
+    [:hash,
+     [:hash, [:lit, :a], [:lit, 1], [:lit, :b], [:lit, 2]],
+     [:lit, :b],
+     [:lit, 2]]
+  end
+
+  parse <<-ruby do
+      { a: 1, **{ b: 2 }, c: 3 }
+    ruby
+
+    [:hash,
+     [:lit, :a],
+     [:lit, 1],
+     [:hash, [:lit, :b], [:lit, 2]],
+     [:lit, :c],
+     [:lit, 3]]
+  end
+
+  parse <<-ruby do
+      h = { a: 1 }
+      { b: 2, **h }
+    ruby
+
+    [:block,
+     [:lasgn, :h, [:hash, [:lit, :a], [:lit, 1]]],
+     [:hash, [:lit, :b], [:lit, 2], [:lvar, :h]]]
+  end
+
+  parse <<-ruby do
+      { a: 1, **h, c: 3 }
+    ruby
+
+    [:hash,
+     [:lit, :a],
+     [:lit, 1],
+     [:call, nil, :h, [:arglist]],
+     [:lit, :c],
+     [:lit, 3]]
+  end
 end
