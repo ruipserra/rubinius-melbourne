@@ -499,7 +499,7 @@ static int scan_hex(const char *start, size_t len, size_t *retlen);
 %type <node> args call_args opt_call_args
 %type <node> paren_args opt_paren_args args_tail opt_args_tail block_args_tail opt_block_args_tail
 %type <node> command_args aref_args opt_block_arg block_arg var_ref var_lhs
-%type <node> command_asgn mrhs superclass block_call block_command
+%type <node> command_asgn mrhs mrhs_arg superclass block_call block_command
 %type <node> f_block_optarg f_block_opt
 %type <node> f_arglist f_args f_arg f_arg_item f_optarg f_marg f_marg_list f_margs
 %type <node> assoc_list assocs assoc undef_list backref string_dvar for_var
@@ -767,9 +767,8 @@ stmt            : keyword_alias fitem {lex_state = EXPR_FNAME;} fitem
                 | command_asgn
                 | mlhs '=' command_call
                   {
-                    // This is deliberately different than MRI.
                     value_expr($3);
-                    $1->nd_value = ($1->nd_head) ? NEW_TO_ARY($3) : NEW_ARRAY($3);
+                    $1->nd_value = $3;
                     $$ = $1;
                   }
                 | var_lhs tOP_ASGN command_call
@@ -824,15 +823,8 @@ stmt            : keyword_alias fitem {lex_state = EXPR_FNAME;} fitem
                     value_expr($3);
                     $$ = node_assign($1, $3);
                   }
-                | mlhs '=' arg_value
+                | mlhs '=' mrhs_arg
                   {
-                    // This is deliberately different than MRI.
-                    $1->nd_value = ($1->nd_head) ? NEW_TO_ARY($3) : NEW_ARRAY($3);
-                    $$ = $1;
-                  }
-                | mlhs '=' mrhs
-                  {
-                    // This is deliberately different than MRI.
                     $1->nd_value = $3;
                     $$ = $1;
                   }
@@ -1592,6 +1584,10 @@ args            : arg_value
                       $$ = arg_concat($1, $4);
                     }
                   }
+                ;
+
+mrhs_arg        : mrhs
+                | arg_value
                 ;
 
 mrhs            : args ',' arg_value
