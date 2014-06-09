@@ -8,7 +8,7 @@ describe "A Masgn node" do
   end
 
   parse "a, = []" do
-    [:masgn, [:array, [:lasgn, :a]], [:to_ary, [:array]]]
+    [:masgn, [:array, [:lasgn, :a]], [:array]]
   end
 
   parse "a, b = b, a" do
@@ -26,7 +26,7 @@ describe "A Masgn node" do
       [:lasgn, :_],
       [:lasgn, :c],
       [:lasgn, :_]],
-     [:to_ary, [:call, nil, :x, [:arglist]]]]
+     [:call, nil, :x, [:arglist]]]
   end
 
   parse "a.b, a.c = x" do
@@ -34,7 +34,7 @@ describe "A Masgn node" do
      [:array,
       [:attrasgn, [:call, nil, :a, [:arglist]], :b=, [:arglist]],
       [:attrasgn, [:call, nil, :a, [:arglist]], :c=, [:arglist]]],
-     [:to_ary, [:call, nil, :x, [:arglist]]]]
+     [:call, nil, :x, [:arglist]]]
   end
 
   parse "a[0], a[1] = 1, 2" do
@@ -50,7 +50,7 @@ describe "A Masgn node" do
   end
 
   parse "*a = nil" do
-    [:masgn, [:array, [:splat, [:lasgn, :a]]], [:array, [:nil]]]
+    [:masgn, [:array, [:splat, [:lasgn, :a]]], [:nil]]
   end
 
   parse "*a = x, y, z" do
@@ -84,7 +84,7 @@ describe "A Masgn node" do
   end
 
   parse "(*) = x" do
-    [:masgn, [:array, [:splat]], [:array, [:call, nil, :x, [:arglist]]]]
+    [:masgn, [:array, [:splat]], [:call, nil, :x, [:arglist]]]
   end
 
   parse "(*) = *x" do
@@ -108,7 +108,7 @@ describe "A Masgn node" do
     [:masgn,
      [:array, [:splat, [:lasgn, :a]]],
      [:lasgn, :b],
-     [:array, [:call, nil, :m, [:arglist, [:call, nil, :x, [:arglist]]]]]]
+     [:call, nil, :m, [:arglist, [:call, nil, :x, [:arglist]]]]]
   end
 
   parse "(*a, b), (*c, d) = 1, 2, 3" do
@@ -163,10 +163,9 @@ describe "A Masgn node" do
           [:lasgn, :h],
           [:masgn, [:array, [:lasgn, :i], [:lasgn, :j]]],
           [:lasgn, :k]]]]]],
-     [:to_ary,
-      [:call,
-       [:call, nil, :x, [:arglist]],
-       :y,
-       [:arglist, [:call, nil, :q, [:arglist]], [:call, nil, :r, [:arglist]]]]]]
+     [:call,
+      [:call, nil, :x, [:arglist]],
+      :y,
+      [:arglist, [:call, nil, :q, [:arglist]], [:call, nil, :r, [:arglist]]]]]
   end
 end
