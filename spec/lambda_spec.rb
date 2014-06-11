@@ -30,8 +30,8 @@ describe "A Lambda node" do
       [:masgn,
        [:array,
         [:lasgn, :b],
-        [:masgn, [:array, [:lasgn, :c], [:splat, :d]]],
-        [:splat, :e]]]],
+        [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]],
+        [:splat, [:lasgn, :e]]]]],
      [:scope, [:nil]]]
   end
 
@@ -56,11 +56,11 @@ describe "A Lambda node" do
   end
 
   parse "-> (*a, b, c:) { }" do
-    [:lambda, [:args, :"*a", :b, :c, [:block, [:c], []]], [:scope, [:nil]]]
+    [:lambda, [:args, :"*a", :b, :c, [:block, [:c]]], [:scope, [:nil]]]
   end
 
   parse "-> (*a, b, c:, **) { }" do
-    [:lambda, [:args, :"*a", :b, :c, :**, [:block, [:c], []]], [:scope, [:nil]]]
+    [:lambda, [:args, :"*a", :b, :c, :**, [:block, [:c, :**]]], [:scope, [:nil]]]
   end
 
   parse "-> (a: 1, b:) { }" do
@@ -81,7 +81,9 @@ describe "A Lambda node" do
       :a,
       :b,
       :"**k",
-      [:block, [:a, :b], [[:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]],
+      [:block,
+       [:a, :b, :"**k"],
+       [[:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]],
      [:scope, [:nil]]]
   end
 
@@ -98,7 +100,7 @@ describe "A Lambda node" do
       :"**k",
       :"&l",
       [:block, [:lasgn, :b, [:lit, 1]]],
-      [:block, [:e, :f, :g], [[:lasgn, :f, [:lit, 2]]]]],
+      [:block, [:e, :f, :g, :"**k"], [[:lasgn, :f, [:lit, 2]]]]],
      [:scope, [:call, [:call, nil, :x, [:arglist]], :+, [:arglist, [:lvar, :a]]]]]
   end
 end

@@ -42,8 +42,8 @@ describe "A Defs node" do
       [:masgn,
        [:array,
         [:lasgn, :b],
-        [:masgn, [:array, [:lasgn, :c], [:splat, :d]]],
-        [:splat, :e]]],
+        [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]],
+        [:splat, [:lasgn, :e]]]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -66,7 +66,7 @@ describe "A Defs node" do
       :"**k",
       :"&l",
       [:block, [:lasgn, :b, [:lit, 1]]],
-      [:block, [:e, :f, :g], [[:lasgn, :f, [:lit, 2]]]]],
+      [:block, [:e, :f, :g, :"**k"], [[:lasgn, :f, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -89,7 +89,7 @@ describe "A Defs node" do
       :"**k",
       :"&l",
       [:block, [:lasgn, :b, [:lit, 1]]],
-      [:block, [:e, :f, :g], [[:lasgn, :f, [:lit, 2]]]]],
+      [:block, [:e, :f, :g, :"**k"], [[:lasgn, :f, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 end
