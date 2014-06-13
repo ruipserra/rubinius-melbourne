@@ -36,7 +36,9 @@ describe "An Iter node" do
      :m,
      [:arglist,
       [:iter,
-       [:args, :a, [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]]]],
+       [:args,
+        :a,
+        [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]], [:lvar, :"_:1"]]],
        [:nil]]]]
   end
 
@@ -63,7 +65,8 @@ describe "An Iter node" do
          [:array,
           [:lasgn, :b],
           [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]],
-          [:splat, [:lasgn, :e]]]],
+          [:splat, [:lasgn, :e]]],
+         [:lvar, :"_:1"]],
         [:block, [:lasgn, :a, [:lit, 1]]]],
        [:nil]]]]
   end

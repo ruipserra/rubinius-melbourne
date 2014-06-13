@@ -27,7 +27,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, [:masgn, [:array, [:lasgn, :a]]]],
+     [:args, [:masgn, [:array, [:lasgn, :a]], [:lvar, :"_:1"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -37,7 +37,8 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, [:masgn, [:array, [:splat, [:lasgn, :a]]], [:lasgn, :b]]],
+     [:args,
+      [:masgn, [:array, [:splat, [:lasgn, :a]]], [:lasgn, :b], [:lvar, :"_:1"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -116,7 +117,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]]]],
+     [:args, :a, [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]], [:lvar, :"_:1"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -126,7 +127,9 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, [:masgn, [:array, [:lasgn, :a]]], [:masgn, [:array, [:lasgn, :b]]]],
+     [:args,
+      [:masgn, [:array, [:lasgn, :a]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:lasgn, :b]], [:lvar, :"_:2"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -136,7 +139,9 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, [:masgn, [:array, [:splat]]], [:masgn, [:array, [:splat]]]],
+     [:args,
+      [:masgn, [:array, [:splat]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:splat]], [:lvar, :"_:2"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -147,8 +152,8 @@ describe "A Defn node" do
     [:defn,
      :m,
      [:args,
-      [:masgn, [:array, [:splat, [:lasgn, :a]]]],
-      [:masgn, [:array, [:splat, [:lasgn, :c]]]]],
+      [:masgn, [:array, [:splat, [:lasgn, :a]]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:splat, [:lasgn, :c]]], [:lvar, :"_:2"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -159,8 +164,8 @@ describe "A Defn node" do
     [:defn,
      :m,
      [:args,
-      [:masgn, [:array, [:lasgn, :a], [:lasgn, :b]]],
-      [:masgn, [:array, [:lasgn, :c], [:lasgn, :d]]]],
+      [:masgn, [:array, [:lasgn, :a], [:lasgn, :b]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:lasgn, :c], [:lasgn, :d]], [:lvar, :"_:2"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -171,8 +176,8 @@ describe "A Defn node" do
     [:defn,
      :m,
      [:args,
-      [:masgn, [:array, [:lasgn, :a], [:splat, [:lasgn, :b]]]],
-      [:masgn, [:array, [:splat, [:lasgn, :c]]], [:lasgn, :d]]],
+      [:masgn, [:array, [:lasgn, :a], [:splat, [:lasgn, :b]]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:splat, [:lasgn, :c]]], [:lasgn, :d], [:lvar, :"_:2"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -185,9 +190,14 @@ describe "A Defn node" do
      [:args,
       [:masgn,
        [:array, [:lasgn, :a], [:lasgn, :b], [:splat, [:lasgn, :c]]],
-       [:lasgn, :d]],
-      [:masgn, [:array, [:splat, [:lasgn, :e]]], [:lasgn, :f], [:lasgn, :g]],
-      [:masgn, [:array, [:splat, [:lasgn, :h]]]]],
+       [:lasgn, :d],
+       [:lvar, :"_:1"]],
+      [:masgn,
+       [:array, [:splat, [:lasgn, :e]]],
+       [:lasgn, :f],
+       [:lasgn, :g],
+       [:lvar, :"_:2"]],
+      [:masgn, [:array, [:splat, [:lasgn, :h]]], [:lvar, :"_:3"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -203,7 +213,8 @@ describe "A Defn node" do
        [:array,
         [:lasgn, :b],
         [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]],
-        [:splat, [:lasgn, :e]]]]],
+        [:splat, [:lasgn, :e]]],
+       [:lvar, :"_:1"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -224,9 +235,8 @@ describe "A Defn node" do
           [:array, [:lasgn, :e], [:masgn, [:array, [:splat, [:lasgn, :f]]]]]],
          [:lasgn, :g]],
         [:masgn,
-         [:array,
-          [:lasgn, :h],
-          [:masgn, [:array, [:lasgn, :i], [:lasgn, :j]]]]]]]],
+         [:array, [:lasgn, :h], [:masgn, [:array, [:lasgn, :i], [:lasgn, :j]]]]]],
+       [:lvar, :"_:1"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -333,7 +343,7 @@ describe "A Defn node" do
      :m,
      [:args,
       :a,
-      [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]]],
+      [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]], [:lvar, :"_:1"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -349,7 +359,8 @@ describe "A Defn node" do
       [:masgn,
        [:array,
         [:lasgn, :b],
-        [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]]]],
+        [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]]],
+       [:lvar, :"_:1"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -366,7 +377,8 @@ describe "A Defn node" do
        [:array,
         [:lasgn, :b],
         [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]],
-        [:splat, [:lasgn, :e]]]],
+        [:splat, [:lasgn, :e]]],
+       [:lvar, :"_:1"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -379,8 +391,8 @@ describe "A Defn node" do
      :m,
      [:args,
       :a,
-      [:masgn, [:array, [:lasgn, :b]]],
-      [:masgn, [:array, [:lasgn, :c]]],
+      [:masgn, [:array, [:lasgn, :b]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:lasgn, :c]], [:lvar, :"_:2"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -393,8 +405,8 @@ describe "A Defn node" do
      :m,
      [:args,
       :a,
-      [:masgn, [:array, [:splat, [:lasgn, :b]]]],
-      [:masgn, [:array, [:splat, [:lasgn, :c]]]],
+      [:masgn, [:array, [:splat, [:lasgn, :b]]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:splat, [:lasgn, :c]]], [:lvar, :"_:2"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -407,8 +419,8 @@ describe "A Defn node" do
      :m,
      [:args,
       :a,
-      [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]]],
-      [:masgn, [:array, [:lasgn, :d], [:lasgn, :e]]],
+      [:masgn, [:array, [:lasgn, :b], [:lasgn, :c]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:lasgn, :d], [:lasgn, :e]], [:lvar, :"_:2"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -421,8 +433,8 @@ describe "A Defn node" do
      :m,
      [:args,
       :a,
-      [:masgn, [:array, [:lasgn, :b], [:splat, [:lasgn, :c]]]],
-      [:masgn, [:array, [:splat, [:lasgn, :d]]], [:lasgn, :e]],
+      [:masgn, [:array, [:lasgn, :b], [:splat, [:lasgn, :c]]], [:lvar, :"_:1"]],
+      [:masgn, [:array, [:splat, [:lasgn, :d]]], [:lasgn, :e], [:lvar, :"_:2"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -435,11 +447,12 @@ describe "A Defn node" do
      :m,
      [:args,
       :a,
-      [:masgn, [:array, [:lasgn, :b], [:splat, [:lasgn, :c]]]],
+      [:masgn, [:array, [:lasgn, :b], [:splat, [:lasgn, :c]]], [:lvar, :"_:1"]],
       [:masgn,
        [:array,
         [:lasgn, :d],
-        [:masgn, [:array, [:splat, [:lasgn, :e]]], [:lasgn, :f]]]],
+        [:masgn, [:array, [:splat, [:lasgn, :e]]], [:lasgn, :f]]],
+       [:lvar, :"_:2"]],
       [:block, [:lasgn, :a, [:lit, 1]]]],
      [:scope, [:block, [:nil]]]]
   end

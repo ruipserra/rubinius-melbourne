@@ -31,7 +31,8 @@ describe "A Lambda node" do
        [:array,
         [:lasgn, :b],
         [:masgn, [:array, [:lasgn, :c], [:splat, [:lasgn, :d]]]],
-        [:splat, [:lasgn, :e]]]]],
+        [:splat, [:lasgn, :e]]],
+       [:lvar, :"_:1"]]],
      [:scope, [:nil]]]
   end
 
