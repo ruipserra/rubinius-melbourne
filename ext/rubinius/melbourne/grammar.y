@@ -796,7 +796,7 @@ stmt            : keyword_alias fitem {lex_state = EXPR_FNAME;} fitem
                 | primary_value '.' tIDENTIFIER tOP_ASGN command_call
                   {
                     value_expr($5);
-                    $$ = new_attr_op_assign($1, $3, $4, $5)
+                    $$ = new_attr_op_assign($1, $3, $4, $5);
                   }
                 | primary_value '.' tCONSTANT tOP_ASGN command_call
                   {
