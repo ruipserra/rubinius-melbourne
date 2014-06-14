@@ -5347,7 +5347,7 @@ yyreduce:
 #line 797 "grammar.y"
     {
                     value_expr((yyvsp[(5) - (5)].node));
-                    (yyval.node) = new_attr_op_assign((yyvsp[(1) - (5)].node), (yyvsp[(3) - (5)].id), (yyvsp[(4) - (5)].id), (yyvsp[(5) - (5)].node))
+                    (yyval.node) = new_attr_op_assign((yyvsp[(1) - (5)].node), (yyvsp[(3) - (5)].id), (yyvsp[(4) - (5)].id), (yyvsp[(5) - (5)].node));
                   ;}
     break;
 
