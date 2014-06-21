@@ -40,17 +40,105 @@ namespace MELBOURNE {
 #define TRUE  true
 #define FALSE false
 
-/*
-#define ISALPHA isalpha
-#define ISSPACE isspace
-#define ISALNUM(x) (isalpha(x) || isnumber(x))
-#define ISDIGIT isdigit
-#define ISXDIGIT isxdigit
-#define ISUPPER isupper
-*/
+/* Functions for multi-byte support imported from MRI 1.8.7
+   Created for grep multi-byte extension Jul., 1993 by t^2 (Takahiro Tanimoto)
+   Last change: Jul. 9, 1993 by t^2  */
+static const unsigned char mbctab_ascii[] = {
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
 
-#define ismbchar(c) (0)
-#define mbclen(c) (1)
+static const unsigned char mbctab_euc[] = { /* 0xA1-0xFE */
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+};
+
+static const unsigned char mbctab_sjis[] = { /* 0x81-0x9F,0xE0-0xFC */
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0
+};
+
+static const unsigned char mbctab_sjis_trail[] = { /* 0x40-0x7E,0x80-0xFC */
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0
+};
+
+static const unsigned char mbctab_utf8[] = {
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+  3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 0, 0,
+};
+
+static const unsigned char* re_mbcinit();
 
 #define string_new(ptr, len) blk2bstr(ptr, len)
 #define string_new2(ptr) cstr2bstr(ptr)
@@ -93,11 +181,6 @@ mel_yyerror(const char *, rb_parser_state*);
          ((id)&ID_SCOPE_MASK) == ID_CLASS))
 
 
-/* FIXME these went into the ruby_state instead of parser_state
-   because a ton of other crap depends on it
-char *ruby_sourcefile;          current source file
-int   ruby_sourceline;          current line no.
-*/
 static int yylex(void*, void *);
 
 
@@ -206,6 +289,8 @@ rb_parser_state *parser_alloc_state() {
   verbose = RTEST(ruby_verbose);
   magic_comments = new std::vector<bstring>;
   start_lines = new std::list<StartPosition>;
+
+  re_mbctab = re_mbcinit();
 
   quark_indexes = new quark_map();
   quarks = new quark_vector();
@@ -2755,8 +2840,6 @@ none            : /* none */ {$$ = 0;}
 #endif
 #define is_identchar(c) (SIGN_EXTEND_CHAR(c)!=-1&&(ISALNUM(c) || (c) == '_' || ismbchar(c)))
 
-#define LEAVE_BS 1
-
 static int
 mel_yyerror(const char *msg, rb_parser_state *parser_state)
 {
@@ -2789,6 +2872,28 @@ yycompile(rb_parser_state *parser_state, char *f, int line)
     lex_strterm = 0;
 
     return n;
+}
+
+static const unsigned char*
+re_mbcinit()
+{
+  const char* code = rb_get_kcode();
+
+  switch(code[0]) {
+  case 'E':
+    return mbctab_euc;
+
+  case 'S':
+    return mbctab_sjis;
+
+  case 'U':
+    return mbctab_utf8;
+
+  case 'N':
+  case 'A':
+  default:
+    return mbctab_ascii;
+  }
 }
 
 static bool
@@ -4502,18 +4607,11 @@ yylex(void *yylval_v, void *vstate)
                 c = 'Q';
             }
             else {
-                term = nextc();
-                if (ISALNUM(term) /* || ismbchar(term) */) {
-                    cur = tmpstr;
-                    *cur++ = c;
-                    while(ISALNUM(term) /* || ismbchar(term) */) {
-                        *cur++ = term;
-                        term = nextc();
-                    }
-                    *cur = 0;
-                    c = 1;
-
-                }
+              term = nextc();
+              if(ISALNUM(term) || ismbchar(term)) {
+                yyerror("unknown type of %string");
+                return 0;
+              }
             }
             if (c == -1 || term == -1) {
                 rb_compile_error(parser_state, "unterminated quoted string meets end of file");
@@ -4561,17 +4659,9 @@ yylex(void *yylval_v, void *vstate)
                 lex_state = EXPR_FNAME;
                 return tSYMBEG;
 
-              case 1:
-                lex_strterm = NEW_STRTERM(str_xquote, term, paren);
-                pslval->id = rb_parser_sym(parser_state, tmpstr);
-                return tXSTRING_BEG;
-
               default:
-                lex_strterm = NEW_STRTERM(str_xquote, term, paren);
-                tmpstr[0] = c;
-                tmpstr[1] = 0;
-                pslval->id = rb_parser_sym(parser_state, tmpstr);
-                return tXSTRING_BEG;
+                yyerror("unknown type of %string");
+                return 0;
             }
         }
         if ((c = nextc()) == '=') {

@@ -103,6 +103,8 @@ typedef VALUE stack_type;
     char *sourcefile;
     int sourceline;
 
+    const unsigned char* re_mbctab;
+
     // Keeps track of lines that 'end' starters are on, to enable
     // better error reporting.
     std::list<StartPosition>* start_lines;
@@ -169,8 +171,13 @@ typedef VALUE stack_type;
 #define start_lines         PARSER_VAR(start_lines)
 #define sourcefile          PARSER_VAR(sourcefile)
 #define sourceline          PARSER_VAR(sourceline)
+#define re_mbctab           PARSER_VAR(re_mbctab)
 #define quark_indexes       PARSER_VAR(quark_indexes)
 #define quarks              PARSER_VAR(quarks)
+
+#undef ismbchar
+#define ismbchar(c)         re_mbctab[(unsigned char)(c)]
+#define mbclen(c)           (re_mbctab[(unsigned char)(c)]+1)
 
 #define node_newnode(t, a, b, c)  parser_node_newnode((rb_parser_state*)parser_state, t, a, b, c)
 
