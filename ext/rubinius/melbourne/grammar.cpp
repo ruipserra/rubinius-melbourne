@@ -8068,7 +8068,16 @@ yycompile(rb_parser_state *parser_state, char *f, int line)
 static const unsigned char*
 re_mbcinit()
 {
-  const char* code = rb_get_kcode();
+#ifdef HAVE_RUBY_ENCODING_H
+  return mbctab_ascii;
+#else
+  VALUE kcode = rb_gv_get("$KCODE");
+
+  if(NIL_P(kcode)) {
+    return mbctab_ascii;
+  }
+
+  const char* code = RSTRING_PTR(kcode);
 
   switch(code[0]) {
   case 'E':
@@ -8085,6 +8094,7 @@ re_mbcinit()
   default:
     return mbctab_ascii;
   }
+#endif
 }
 
 static bool
