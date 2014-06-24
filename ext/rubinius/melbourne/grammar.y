@@ -19,7 +19,6 @@
 
 #include "namespace.h"
 #include "melbourne.hpp"
-#include "missing.hpp"
 #include "grammar.hpp"
 #include "parser_state.hpp"
 #include "visitor.hpp"
@@ -7306,12 +7305,15 @@ parser_negate_lit(rb_parser_state* parser_state, NODE *node)
   case T_FIXNUM:
     node->nd_lit = LONG2FIX(-FIX2LONG(node->nd_lit));
     break;
+  case T_BIGNUM:
+  case T_RATIONAL:
+  case T_COMPLEX:
+    node->nd_lit = REF(rb_funcall(node->nd_lit, rb_intern("-@"), 0, 0));
+    break;
   case T_FLOAT:
     node->nd_lit = REF(rb_float_new(-NUM2DBL(node->nd_lit)));
     break;
-  case T_BIGNUM:
   default:
-    node->nd_lit = REF(rb_funcall(node->nd_lit, rb_intern("-@"), 0, 0));
     break;
   }
   return node;
