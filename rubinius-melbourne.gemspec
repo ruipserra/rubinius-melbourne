@@ -17,6 +17,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.version       = CodeTools::Melbourne::VERSION
 
+  spec.required_ruby_version = ">= 1.9.2"
+
   spec.add_development_dependency "rubinius-processor", "~> 2.0"
   spec.add_development_dependency "rubinius-compiler", "~> 2.0"
   spec.add_development_dependency "rubinius-ast", "~> 2.0"
