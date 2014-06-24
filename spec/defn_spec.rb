@@ -70,7 +70,7 @@ describe "A Defn node" do
       def m(a:) end
     ruby
 
-    [:defn, :m, [:args, :a, [:block, [:a]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :a, [:kwargs, [:a]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -79,7 +79,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, [:block, [:a], [[:lasgn, :a, [:lit, 1]]]]],
+     [:args, :a, [:kwargs, [:a], [[:lasgn, :a, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -87,14 +87,14 @@ describe "A Defn node" do
       def m(**) end
     ruby
 
-    [:defn, :m, [:args, :**, [:block, [:**]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :**, [:kwargs, [:**]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
       def m(**k) end
     ruby
 
-    [:defn, :m, [:args, :"**k", [:block, [:"**k"]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :"**k", [:kwargs, [:"**k"]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -268,7 +268,7 @@ describe "A Defn node" do
       def m(a, b:) end
     ruby
 
-    [:defn, :m, [:args, :a, :b, [:block, [:b]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :a, :b, [:kwargs, [:b]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -277,7 +277,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :b, [:block, [:b], [[:lasgn, :b, [:lit, 1]]]]],
+     [:args, :a, :b, [:kwargs, [:b], [[:lasgn, :b, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -285,7 +285,7 @@ describe "A Defn node" do
       def m(a, **) end
     ruby
 
-    [:defn, :m, [:args, :a, :**, [:block, [:**]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :a, :**, [:kwargs, [:**]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -294,7 +294,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :"**k", [:block, [:"**k"]]],
+     [:args, :a, :"**k", [:kwargs, [:"**k"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -463,7 +463,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :b, [:block, [:lasgn, :a, [:lit, 1]]], [:block, [:b]]],
+     [:args, :a, :b, [:block, [:lasgn, :a, [:lit, 1]]], [:kwargs, [:b]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -477,7 +477,7 @@ describe "A Defn node" do
       :a,
       :b,
       [:block, [:lasgn, :a, [:lit, 1]]],
-      [:block, [:b], [[:lasgn, :b, [:lit, 2]]]]],
+      [:kwargs, [:b], [[:lasgn, :b, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -487,7 +487,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :**, [:block, [:lasgn, :a, [:lit, 1]]], [:block, [:**]]],
+     [:args, :a, :**, [:block, [:lasgn, :a, [:lit, 1]]], [:kwargs, [:**]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -497,7 +497,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :"**k", [:block, [:lasgn, :a, [:lit, 1]]], [:block, [:"**k"]]],
+     [:args, :a, :"**k", [:block, [:lasgn, :a, [:lit, 1]]], [:kwargs, [:"**k"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -529,14 +529,14 @@ describe "A Defn node" do
       def m(*, a:) end
     ruby
 
-    [:defn, :m, [:args, :*, :a, [:block, [:a]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :*, :a, [:kwargs, [:a]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
       def m(*a, b:) end
     ruby
 
-    [:defn, :m, [:args, :"*a", :b, [:block, [:b]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :"*a", :b, [:kwargs, [:b]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -545,7 +545,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :*, :a, [:block, [:a], [[:lasgn, :a, [:lit, 1]]]]],
+     [:args, :*, :a, [:kwargs, [:a], [[:lasgn, :a, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -555,7 +555,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :"*a", :b, [:block, [:b], [[:lasgn, :b, [:lit, 1]]]]],
+     [:args, :"*a", :b, [:kwargs, [:b], [[:lasgn, :b, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -563,14 +563,14 @@ describe "A Defn node" do
       def m(*, **) end
     ruby
 
-    [:defn, :m, [:args, :*, :**, [:block, [:**]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :*, :**, [:kwargs, [:**]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
       def m(*a, **) end
     ruby
 
-    [:defn, :m, [:args, :"*a", :**, [:block, [:**]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :"*a", :**, [:kwargs, [:**]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -579,7 +579,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :*, :"**k", [:block, [:"**k"]]],
+     [:args, :*, :"**k", [:kwargs, [:"**k"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -589,7 +589,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :"*a", :"**k", [:block, [:"**k"]]],
+     [:args, :"*a", :"**k", [:kwargs, [:"**k"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -611,7 +611,7 @@ describe "A Defn node" do
       def m(a:, b:) end
     ruby
 
-    [:defn, :m, [:args, :a, :b, [:block, [:a, :b]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :a, :b, [:kwargs, [:a, :b]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -620,7 +620,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :b, [:block, [:a, :b], [[:lasgn, :b, [:lit, 1]]]]],
+     [:args, :a, :b, [:kwargs, [:a, :b], [[:lasgn, :b, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -628,7 +628,7 @@ describe "A Defn node" do
       def m(a:, **) end
     ruby
 
-    [:defn, :m, [:args, :a, :**, [:block, [:a, :**]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :a, :**, [:kwargs, [:a, :**]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -637,7 +637,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :"**k", [:block, [:a, :"**k"]]],
+     [:args, :a, :"**k", [:kwargs, [:a, :"**k"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -645,7 +645,7 @@ describe "A Defn node" do
       def m(a:, &b) end
     ruby
 
-    [:defn, :m, [:args, :a, :"&b", [:block, [:a]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :a, :"&b", [:kwargs, [:a]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -654,7 +654,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :b, [:block, [:a, :b], [[:lasgn, :a, [:lit, 1]]]]],
+     [:args, :a, :b, [:kwargs, [:a, :b], [[:lasgn, :a, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -667,13 +667,13 @@ describe "A Defn node" do
      [:args,
       :a,
       :b,
-      [:block,
+      [:kwargs,
        [:a, :b],
        [[:lasgn,
          :a,
          [:defn,
           :m,
-          [:args, :a, [:block, [:a], [[:lasgn, :a, [:lit, 1]]]]],
+          [:args, :a, [:kwargs, [:a], [[:lasgn, :a, [:lit, 1]]]]],
           [:scope, [:block, [:lvar, :a]]]]]]]],
      [:scope, [:block, [:nil]]]]
   end
@@ -687,7 +687,7 @@ describe "A Defn node" do
      [:args,
       :a,
       :b,
-      [:block, [:a, :b], [[:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]],
+      [:kwargs, [:a, :b], [[:lasgn, :a, [:lit, 1]], [:lasgn, :b, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -697,7 +697,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :**, [:block, [:a, :**], [[:lasgn, :a, [:lit, 1]]]]],
+     [:args, :a, :**, [:kwargs, [:a, :**], [[:lasgn, :a, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -707,7 +707,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :"**k", [:block, [:a, :"**k"], [[:lasgn, :a, [:lit, 1]]]]],
+     [:args, :a, :"**k", [:kwargs, [:a, :"**k"], [[:lasgn, :a, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -717,7 +717,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :a, :"&b", [:block, [:a], [[:lasgn, :a, [:lit, 1]]]]],
+     [:args, :a, :"&b", [:kwargs, [:a], [[:lasgn, :a, [:lit, 1]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -725,7 +725,7 @@ describe "A Defn node" do
       def m(**, &b) end
     ruby
 
-    [:defn, :m, [:args, :**, :"&b", [:block, [:**]]], [:scope, [:block, [:nil]]]]
+    [:defn, :m, [:args, :**, :"&b", [:kwargs, [:**]]], [:scope, [:block, [:nil]]]]
   end
 
   parse <<-ruby do
@@ -734,7 +734,7 @@ describe "A Defn node" do
 
     [:defn,
      :m,
-     [:args, :"**k", :"&b", [:block, [:"**k"]]],
+     [:args, :"**k", :"&b", [:kwargs, [:"**k"]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -755,7 +755,7 @@ describe "A Defn node" do
       :"**k",
       :"&l",
       [:block, [:lasgn, :b, [:lit, 1]]],
-      [:block, [:e, :f, :g, :"**k"], [[:lasgn, :f, [:lit, 2]]]]],
+      [:kwargs, [:e, :f, :g, :"**k"], [[:lasgn, :f, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 
@@ -777,7 +777,7 @@ describe "A Defn node" do
       :"**k",
       :"&l",
       [:block, [:lasgn, :b, [:lit, 1]]],
-      [:block, [:e, :f, :g, :"**k"], [[:lasgn, :f, [:lit, 2]]]]],
+      [:kwargs, [:e, :f, :g, :"**k"], [[:lasgn, :f, [:lit, 2]]]]],
      [:scope, [:block, [:nil]]]]
   end
 end
