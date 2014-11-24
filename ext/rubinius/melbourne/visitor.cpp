@@ -498,6 +498,23 @@ namespace MELBOURNE {
       tree = rb_funcall(ptp, rb_sOpAsgnOr, 3, line, var, value);
       break;
     }
+    case NODE_OP_CDECL: {
+      VALUE op;
+      VALUE var = process_parse_tree(parser_state, ptp, node->nd_head, locals);
+      VALUE value = process_parse_tree(parser_state, ptp, node->nd_value, locals);
+      switch(node->nd_aid) {
+        case 0:
+          op = ID2SYM(parser_intern("or"));
+          break;
+        case 1:
+          op = ID2SYM(parser_intern("and"));
+          break;
+        default:
+          op = ID2SYM(node->nd_aid);
+      }
+      tree = rb_funcall(ptp, rb_sOpCDecl, 4, line, var, value, op);
+      break;
+    }
     case NODE_MASGN: {
       VALUE args = Qnil;
 
