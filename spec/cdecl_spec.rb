@@ -30,4 +30,22 @@ describe "A Cdecl node" do
      [:lasgn, :a, [:const, :Object]],
      [:cdecl, [:colon2, [:lvar, :a], :B], [:call, nil, :b, [:arglist]]]]
   end
+
+  parse "X::Y ||= 1" do
+    [:cdecl,
+     [:colon2, [:const, :X], :Y],
+     [:or, [:colon2, [:const, :X], :Y], [:lit, 1]]]
+  end
+
+  parse "X::Y &&= 1" do
+    [:cdecl,
+     [:colon2, [:const, :X], :Y],
+     [:and, [:colon2, [:const, :X], :Y], [:lit, 1]]]
+  end
+
+  parse "X::Y += 1" do
+    [:cdecl,
+     [:colon2, [:const, :X], :Y],
+     [:call, [:colon2, [:const, :X], :Y], :+, [:arglist, [:lit, 1]]]]
+  end
 end
