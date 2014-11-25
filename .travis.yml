@@ -1,6 +1,6 @@
 language: ruby
 env:
-  - MELBOURNE_SPEC_VERSION=1 RUBYLIB=lib:.
+  - MELBOURNE_SPEC_VERSION=1
 before_install: gem install rubinius-toolset
 rvm:
   - 2.1.0

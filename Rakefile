@@ -34,6 +34,7 @@ end
 
 desc "Run the specs"
 task :spec => %w[spec:clean spec:build] do
+  ENV['RUBYLIB'] ||= 'lib:.'
   sh "mspec -r spec/spec_helper spec"
 end
 
