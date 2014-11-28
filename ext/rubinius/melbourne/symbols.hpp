@@ -79,6 +79,7 @@ namespace MELBOURNE {
   extern ID rb_sOpAsgn2;
   extern ID rb_sOpAsgnAnd;
   extern ID rb_sOpAsgnOr;
+  extern ID rb_sOpCDecl;
   extern ID rb_sOptArg;
   extern ID rb_sOr;
   extern ID rb_sPostExe;

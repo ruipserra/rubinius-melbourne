@@ -80,6 +80,7 @@ namespace MELBOURNE {
   ID rb_sOpAsgn2;
   ID rb_sOpAsgnAnd;
   ID rb_sOpAsgnOr;
+  ID rb_sOpCDecl;
   ID rb_sOptArg;
   ID rb_sOr;
   ID rb_sPostExe;
@@ -195,6 +196,7 @@ namespace MELBOURNE {
     rb_sOpAsgn2     = rb_intern("process_op_asgn2");
     rb_sOpAsgnAnd   = rb_intern("process_op_asgn_and");
     rb_sOpAsgnOr    = rb_intern("process_op_asgn_or");
+    rb_sOpCDecl     = rb_intern("process_op_cdecl");
     rb_sOptArg      = rb_intern("process_opt_arg");
     rb_sOr          = rb_intern("process_or");
     rb_sPostExe     = rb_intern("process_postexe");
