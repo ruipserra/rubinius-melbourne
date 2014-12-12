@@ -1,5 +1,5 @@
-module Rubinius::ToolSets.current::ToolSet
+module CodeTools
   class Melbourne
-    VERSION = "1.1.1.1"
+    VERSION = "1.2.0.0"
   end
 end
