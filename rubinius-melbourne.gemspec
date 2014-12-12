@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "rubinius-melbourne"
   gem.require_paths = ["lib"]
-  gem.version       = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
+  gem.version       = CodeTools::Melbourne::VERSION
 
   gem.add_runtime_dependency      "rubinius-toolset", "~> 2.0"
 

@@ -1,24 +1,14 @@
 require 'rbconfig'
 
-# Fake out Rubinius::ToolSets for bootstrapping
-module Rubinius
-  module ToolSets
-    def self.current
-      @current ||= Module.new
-      @current.const_set :ToolSet, @current
-    end
-  end
-end
-
 require File.expand_path("../../../../lib/rubinius/melbourne/version", __FILE__)
 
 path = File.expand_path "../namespace.h", __FILE__
 File.open path, "wb" do |f|
-  version = Rubinius::ToolSets.current::ToolSet::Melbourne::VERSION
+  version = CodeTools::Melbourne::VERSION
 
   if ENV["MELBOURNE_SPEC_VERSION"]
     # Alter the version to not match any possible loaded version
-    version = version.split(".").map { |x| x + 1 }.join(".")
+    version << ".spec"
   end
 
   melbourne = "melbourne_#{version.gsub(/\./, "_")}"
@@ -36,6 +26,7 @@ unless File.exist? "Makefile" and
 
   incdirs = [
     RbConfig::CONFIG["arch_hdrdir"],
+    RbConfig::CONFIG["rubyarchhdrdir"],
     RbConfig::CONFIG["topdir"],
     RbConfig::CONFIG["hdrdir"],
     RbConfig::CONFIG["rubyhdrdir"],
@@ -75,7 +66,7 @@ unless File.exist? "Makefile" and
       if RbConfig::CONFIG['CC'] == 'cc' and `cc -flags 2>&1` =~ /Sun/
         # SUN CHAIN
         cxxflags << " -DCC_SUNWspro"
-        cxxflags.gsub! /-fPIC/, ""
+        cxxflags.gsub!(/-fPIC/, "")
         cxxflags << " -KPIC"
         ldsharedxx = "#{cxx} -G -KPIC -lCstd"
       else
