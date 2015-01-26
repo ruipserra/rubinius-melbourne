@@ -13473,7 +13473,7 @@ parser_new_args_tail(rb_parser_state* parser_state, NODE *k, ID kr, ID b)
   NODE *kw_rest_arg = 0;
   NODE *node;
 
-  args = ALLOC(struct rb_args_info);
+  args = (struct rb_args_info *)pt_allocate(parser_state, sizeof(struct rb_args_info));
   MEMZERO(args, struct rb_args_info, 1);
   node = NEW_NODE(NODE_ARGS, 0, 0, args);
 
