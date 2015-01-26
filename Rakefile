@@ -11,6 +11,11 @@ def spec_ruby_version
   ".spec_ruby_version"
 end
 
+desc "Generate the parser"
+task :generate do
+  extension_dir { sh "bison -o grammar.cpp grammar.y" }
+end
+
 namespace :spec do
   desc "Clean the parser extension"
   task :clean do
@@ -24,7 +29,7 @@ namespace :spec do
   end
 
   desc "Build the parser extension"
-  task :build do
+  task :build => :generate do
     extension_dir do
       ruby "-v extconf.rb"
       ruby "-e 'system %[make && make install]'"
