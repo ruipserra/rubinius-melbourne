@@ -147,10 +147,6 @@ install:
 
 .SUFFIXES: .y .cpp .o
 
-.y.cpp:
-	$(ECHO) generating parser $(<)
-	$(Q) bison -o $@ $<
-
 .cpp.o:
 	$(ECHO) compiling $(<)
 	$(Q) $(CXX) $(CXXFLAGS) $(INCFLAGS) -o $@ -c $<
