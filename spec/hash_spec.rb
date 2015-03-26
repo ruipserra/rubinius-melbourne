@@ -26,6 +26,27 @@ describe "A Hash node" do
   end
 
   parse <<-ruby do
+      { 'a key': 1 }
+    ruby
+
+    [:block,
+     [:hash, [:lit, :'a key'], [:lit, 1]]]
+  end
+
+  parse <<-ruby do
+      { "x#{(1 + 1)}y": 1 }
+    ruby
+
+    [:block,
+     [:hash,
+      [:dsym,
+       "x",
+       [:evstr, [:call, [:lit, 1], :+, [:arglist, [:lit, 1]]]],
+       [:str, "y"]],
+      [:lit, 1]]]
+  end
+
+  parse <<-ruby do
       { **{ a: 1, b: 2 }, b: 2 }
     ruby
 
